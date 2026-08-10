@@ -79,6 +79,9 @@
   .flavor.spicy{background:linear-gradient(160deg,rgba(255,77,109,.22),rgba(255,123,0,.12)); }
   .flavor.spicy:hover{border-color:#ff4d6d; box-shadow:0 12px 40px rgba(255,77,109,.3);}
   .flavor.spicy .badge{background:#7f1d1d; color:#fecaca;}
+  .flavor.soon{opacity:.6; filter:grayscale(.25);}
+  .flavor.soon:hover{transform:translateY(-2px); box-shadow:none; border-color:transparent;}
+  .flavor.soon .badge{background:#334155; color:#cbd5e1; letter-spacing:.5px;}
 
   .startfoot{margin-top:26px; color:var(--mut); font-size:12.5px; line-height:1.7;}
   .startfoot b{color:var(--txt);}
@@ -197,11 +200,11 @@
         <h2>순한맛</h2>
         <div class="d">누구나 편하게 · 인생·사랑·돈·시간<br>고민되는 밸런스 100문항</div>
       </div>
-      <div class="flavor spicy" onclick="pickFlavor('spicy')">
-        <div class="badge">🔞 19+</div>
+      <div class="flavor spicy soon" onclick="comingSoon()">
+        <div class="badge">🔒 COMING SOON</div>
         <div class="em">🌶️</div>
         <h2>매운맛</h2>
-        <div class="d">성인 전용 · 자극적이고 화끈한<br>심장 쫄깃 밸런스 100문항</div>
+        <div class="d">🔞 성인 전용 · 준비 중<br>곧 공개됩니다</div>
       </div>
     </div>
     <div class="chanlabel">📺 쮸래기 채널 바로가기</div>
@@ -336,8 +339,8 @@ const MILD = [
  ]},
   {name:"몸과 능력", emoji:"🧬", color:"#22c55e", q:[
   ["뭘 먹어도 살이 안 찌는데, 대신 하루 종일 배고픔이 안 가셔서 매 순간 먹는 생각만 난다","하루 한 끼만 먹어도 배부른데, 물만 마셔도 살이 쪄서 평생 몸무게에 갇혀 산다"],
-  ["하루 2시간만 자도 멀쩡한데, 남들 다 자는 그 새벽마다 혼자 깨어 사무치게 외롭다","하루 12시간을 자야 개운한데, 깨어있는 인생이 남들 절반이라 뭘 해도 시간이 모자란다"],
-  ["어떤 상처도 3초 만에 낫는데, 대신 통증을 남들의 10배로 느껴 낫는 그 3초가 매번 지옥이다","통증을 전혀 못 느끼는데, 대신 몸이 망가져도 몰라서 어느 날 손쓸 수 없이 무너진다"],
+  ["하루 2시간만 자도 멀쩡한데 전 세계에서 가장 외롭다(외로움 1000배)","하루 14시간을 무조건 자야 하지만 깨어있을 땐 전 세계에서 가장 유능하다"],
+  ["어떤 상처도 3초 만에 낫지만 통증이 100배다","어떤 상처든 통증은 100분의 1인데 낫는 데 걸리는 시간이 10배다"],
   ["세상 모든 언어를 완벽히 알아듣는데, 나는 평생 단 한마디도 소리 내 말할 수 없다","세상 모든 언어를 유창하게 말하는데, 남이 하는 말은 평생 한마디도 못 알아듣는다"],
   ["IQ 200의 천재라 뭐든 꿰뚫어 보는데, 감정이 거의 없어 성취도 사랑도 아무 감흥이 없다","세상을 남들 10배로 짙게 느끼고 감동하는데, 머리가 나빠 평생 속고 손해 보며 산다"],
   ["한 번 본 건 평생 안 잊는데, 잊고 싶은 수치·상처도 방금 일처럼 평생 생생하다","나쁜 기억이 3일이면 다 잊히는데, 소중한 사람·행복한 순간도 똑같이 3일이면 흐려진다"],
@@ -586,6 +589,7 @@ function renderChannels(){
 }
 
 /* ---- navigation ---- */
+function comingSoon(){ toast('🌶️ 매운맛은 곧 공개됩니다 (Coming Soon)'); }
 function pickFlavor(f){
   if(f==='spicy'){ $("ageGate").classList.add('on'); return; }
   flavor='mild'; document.body.classList.remove('spicy');
