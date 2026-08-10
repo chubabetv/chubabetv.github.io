@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쮸래기 밸런스 게임 🔥</title>
+<meta property="og:title" content="쮸래기 밸런스 게임">
+<meta property="og:description" content="순한맛 vs 매운맛 — 당신의 선택은? 진짜 고민되는 5:5 밸런스 게임">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root{
+    --a1:#ff4d6d; --a2:#c9184a; --b1:#4cc9f0; --b2:#3a86ff;
+    --ink:#0a0b14; --ink2:#141726; --line:rgba(255,255,255,.09);
+    --txt:#f2f3f7; --mut:#9aa0b5; --accent:#ffd166;
+    --brand:#ff5c8a;
+  }
+  html,body{height:100%;}
+  body{
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    background:var(--ink); color:var(--txt); min-height:100%; overflow-x:hidden; position:relative;
+  }
+  /* animated background blobs */
+  .bg{position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;}
+  .blob{position:absolute; border-radius:50%; filter:blur(70px); opacity:.5; animation:float 18s ease-in-out infinite;}
+  .blob.x1{width:460px;height:460px;background:#ff4d6d;top:-120px;left:-80px;}
+  .blob.x2{width:420px;height:420px;background:#3a86ff;bottom:-120px;right:-60px;animation-delay:-6s;}
+  .blob.x3{width:360px;height:360px;background:#8b5cf6;top:40%;left:55%;animation-delay:-11s;opacity:.35;}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(40px,-30px) scale(1.08);}66%{transform:translate(-30px,25px) scale(.95);}}
+  body.spicy .blob.x2{background:#ff7b00;} body.spicy .blob.x3{background:#e0245e;}
+
+  .wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:16px 20px 40px; min-height:100vh; display:flex; flex-direction:column;}
+
+  /* ---------- Top bar ---------- */
+  .top{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .brand{font-weight:900; font-size:20px; letter-spacing:-.5px; display:flex; align-items:center; gap:9px; cursor:pointer;}
+  .brand .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--a1),var(--b1));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 16px rgba(255,77,109,.4);}
+  .top .sp{flex:1;}
+  .btn{background:var(--ink2); border:1px solid var(--line); color:var(--txt); padding:8px 13px; border-radius:11px; font-weight:700; font-size:13.5px; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:6px; font-family:inherit;}
+  .btn:hover{border-color:rgba(255,255,255,.28); transform:translateY(-1px);}
+  .btn.ghost{background:transparent;}
+  .btn.sm{padding:6px 10px; font-size:12.5px; border-radius:9px;}
+
+  /* channel links */
+  .chan{display:flex; gap:7px; align-items:center;}
+  .chan a{width:34px;height:34px;border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; text-decoration:none; border:1px solid var(--line); background:var(--ink2); transition:.15s;}
+  .chan a:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.3);}
+  .chan a.forest:hover{background:#1a4d2e;border-color:#2e7d32;}
+  .chan a.yt:hover{background:#3a0d0d;border-color:#ff0000;}
+  .chan a.chz:hover{background:#0a3d2e;border-color:#00ffa3;}
+
+  /* ---------- Start (flavor select) ---------- */
+  #start{flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center; padding:20px 0;}
+  .hero h1{font-size:clamp(34px,7vw,64px); font-weight:900; letter-spacing:-2px; line-height:1.02;}
+  .hero h1 .g{background:linear-gradient(135deg,var(--a1),var(--b1)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero .tag{display:inline-block; margin:14px 0 6px; padding:6px 14px; border-radius:999px; background:var(--ink2); border:1px solid var(--line); font-size:13px; color:var(--mut); font-weight:700;}
+  .hero p{color:var(--mut); margin-top:14px; font-size:15px; line-height:1.6;}
+
+  .flavors{display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:760px; margin:30px auto 10px;}
+  .flavor{position:relative; border-radius:24px; padding:34px 24px; cursor:pointer; transition:.2s; overflow:hidden; border:2px solid transparent;}
+  .flavor:hover{transform:translateY(-4px);}
+  .flavor .em{font-size:52px;}
+  .flavor h2{font-size:26px; font-weight:900; margin-top:10px; letter-spacing:-1px;}
+  .flavor .d{color:var(--mut); font-size:13.5px; margin-top:8px; line-height:1.5;}
+  .flavor .badge{position:absolute; top:16px; right:16px; font-size:11px; font-weight:900; padding:4px 9px; border-radius:999px;}
+  .flavor.mild{background:linear-gradient(160deg,rgba(34,197,94,.18),rgba(16,185,129,.08)); }
+  .flavor.mild:hover{border-color:#22c55e; box-shadow:0 12px 40px rgba(34,197,94,.25);}
+  .flavor.mild .badge{background:#14532d; color:#86efac;}
+  .flavor.spicy{background:linear-gradient(160deg,rgba(255,77,109,.22),rgba(255,123,0,.12)); }
+  .flavor.spicy:hover{border-color:#ff4d6d; box-shadow:0 12px 40px rgba(255,77,109,.3);}
+  .flavor.spicy .badge{background:#7f1d1d; color:#fecaca;}
+
+  .startfoot{margin-top:26px; color:var(--mut); font-size:12.5px; line-height:1.7;}
+  .startfoot b{color:var(--txt);}
+
+  /* ---------- Home (theme grid) ---------- */
+  #home{display:none; flex:1; flex-direction:column;}
+  #home.on{display:flex;}
+  .homehead{display:flex; align-items:center; gap:12px; margin:8px 0 16px; flex-wrap:wrap;}
+  .homehead h2{font-size:22px; font-weight:900; letter-spacing:-.5px;}
+  .flavorPill{font-size:12px; font-weight:900; padding:5px 11px; border-radius:999px;}
+  .flavorPill.mild{background:#14532d;color:#86efac;} .flavorPill.spicy{background:#7f1d1d;color:#fecaca;}
+  .themes{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:13px;}
+  .tcard{position:relative; background:var(--ink2); border:1px solid var(--line); border-radius:18px; padding:18px 16px; cursor:pointer; transition:.18s; overflow:hidden;}
+  .tcard:hover{transform:translateY(-3px); border-color:rgba(255,255,255,.24);}
+  .tcard .em{font-size:28px;}
+  .tcard h3{font-size:17px; font-weight:800; margin-top:9px; letter-spacing:-.5px;}
+  .tcard .sub{color:var(--mut); font-size:12px; margin-top:3px;}
+  .tcard .num{position:absolute; top:13px; right:15px; font-weight:900; font-size:12.5px; color:var(--mut); opacity:.5;}
+  .tcard .bar{position:absolute; left:0; bottom:0; height:5px; width:100%;}
+  .shuffleCard{background:linear-gradient(135deg,rgba(255,77,109,.16),rgba(58,134,255,.16)); border-color:rgba(255,255,255,.16);}
+
+  /* ---------- Game ---------- */
+  #game{display:none; flex:1; flex-direction:column;}
+  #game.on{display:flex;}
+  .gtop{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .chip{background:var(--ink2); border:1px solid var(--line); padding:7px 13px; border-radius:999px; font-weight:800; font-size:13px; display:flex; align-items:center; gap:7px;}
+  .counter{font-weight:900; font-size:15px;}
+  .counter .cur{color:#fff;} .counter .tot{color:var(--mut);}
+  .progress{height:6px; background:var(--ink2); border-radius:999px; overflow:hidden; margin:4px 0 16px;}
+  .progress>i{display:block; height:100%; background:linear-gradient(90deg,var(--a1),var(--b1)); width:0; transition:.3s;}
+
+  .arena{flex:1; display:grid; grid-template-columns:1fr auto 1fr; gap:13px; align-items:stretch; min-height:320px;}
+  .side{position:relative; border-radius:24px; padding:32px 24px; display:flex; flex-direction:column; justify-content:center; cursor:pointer; transition:.18s; border:2px solid transparent; overflow:hidden; min-height:290px;}
+  .side.a{background:linear-gradient(160deg,rgba(255,77,109,.20),rgba(201,24,74,.10));}
+  .side.b{background:linear-gradient(160deg,rgba(76,201,240,.18),rgba(58,134,255,.12));}
+  .side:hover{transform:translateY(-2px);}
+  .side.a.sel{border-color:var(--a1); box-shadow:0 0 40px rgba(255,77,109,.35);}
+  .side.b.sel{border-color:var(--b1); box-shadow:0 0 40px rgba(76,201,240,.35);}
+  .side .tag{font-weight:900; font-size:15px; letter-spacing:1px; opacity:.85; margin-bottom:14px;}
+  .side.a .tag{color:var(--a1);} .side.b .tag{color:var(--b1);}
+  .side .q{font-size:clamp(19px,2.5vw,29px); font-weight:800; line-height:1.4; letter-spacing:-.5px;}
+  .side .pct{position:absolute; right:20px; bottom:16px; font-weight:900; font-size:clamp(26px,4vw,46px); opacity:0; transition:.3s;}
+  .side.a .pct{color:var(--a1);} .side.b .pct{color:var(--b1);}
+  .revealed .side .pct{opacity:.9;}
+
+  .mid{display:flex; align-items:center; justify-content:center; min-width:60px;}
+  .vsbadge{width:64px; height:64px; border-radius:50%; background:var(--ink); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-weight:900; font-style:italic; font-size:23px; box-shadow:0 8px 30px rgba(0,0,0,.5);}
+
+  .votebar{height:14px; border-radius:999px; overflow:hidden; display:flex; margin-top:16px; background:var(--ink2); opacity:.4; transition:.3s;}
+  .revealed .votebar{opacity:1;}
+  .votebar .va{background:linear-gradient(90deg,var(--a2),var(--a1)); width:50%; transition:.5s;}
+  .votebar .vb{background:linear-gradient(90deg,var(--b1),var(--b2)); width:50%; transition:.5s;}
+
+  .controls{display:flex; align-items:center; gap:9px; margin-top:16px; flex-wrap:wrap; justify-content:center;}
+  .vbtn{padding:12px 20px; border-radius:14px; font-weight:900; font-size:15px; border:none; cursor:pointer; color:#fff; transition:.15s; font-family:inherit;}
+  .vbtn.a{background:linear-gradient(135deg,var(--a1),var(--a2));}
+  .vbtn.b{background:linear-gradient(135deg,var(--b1),var(--b2));}
+  .vbtn:active{transform:scale(.95);}
+  .cnt{font-size:12.5px; color:var(--mut); min-width:64px; text-align:center;}
+  .hint{text-align:center; color:var(--mut); font-size:12px; margin-top:12px; opacity:.7;}
+  kbd{background:var(--ink2); border:1px solid var(--line); border-radius:6px; padding:1px 7px; font-size:11px; font-weight:700;}
+
+  /* footer credit */
+  .credit{text-align:center; color:var(--mut); font-size:12px; margin-top:22px; padding-top:16px; border-top:1px solid var(--line); line-height:1.7;}
+  .credit b{color:var(--txt);}
+
+  /* ---------- Modal (age gate) ---------- */
+  .modal{position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.75); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:24px;}
+  .modal.on{display:flex;}
+  .modalbox{background:var(--ink2); border:1px solid var(--line); border-radius:22px; padding:32px 28px; max-width:400px; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.6);}
+  .modalbox .em{font-size:46px;}
+  .modalbox h3{font-size:22px; font-weight:900; margin-top:12px;}
+  .modalbox p{color:var(--mut); font-size:14px; margin-top:10px; line-height:1.6;}
+  .modalbox .row{display:flex; gap:10px; margin-top:22px;}
+  .modalbox .row .btn{flex:1; justify-content:center; padding:13px;}
+  .btn.warn{background:linear-gradient(135deg,#ff4d6d,#c9184a); border:none; color:#fff; font-weight:900;}
+
+  /* toast */
+  .toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); background:#fff; color:#111; padding:12px 20px; border-radius:12px; font-weight:800; font-size:14px; opacity:0; transition:.25s; z-index:60; box-shadow:0 10px 30px rgba(0,0,0,.4); pointer-events:none;}
+  .toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:720px){
+    .flavors{grid-template-columns:1fr;}
+    .arena{grid-template-columns:1fr; gap:10px;}
+    .mid{min-height:0;}
+    .vsbadge{width:50px;height:50px;font-size:18px;}
+    .side{min-height:140px; padding:20px 18px;}
+    .side .pct{position:static; opacity:.9!important; margin-top:8px; font-size:28px;}
+  }
+</style>
+</head>
+<body>
+<div class="bg"><span class="blob x1"></span><span class="blob x2"></span><span class="blob x3"></span></div>
+
+<div class="wrap">
+  <!-- TOP -->
+  <div class="top">
+    <div class="brand" onclick="goStart()"><span class="logo">🎲</span> 쮸래기 밸런스 게임</div>
+    <div class="sp"></div>
+    <div class="chan" id="chanTop"></div>
+    <button class="btn ghost sm" id="btnShare">🔗 공유</button>
+    <button class="btn ghost sm" id="btnFull">⛶</button>
+  </div>
+
+  <!-- START: flavor select -->
+  <div id="start">
+    <div class="hero">
+      <div class="tag">🎬 쮸래기 공식 컨텐츠 · 함께 즐기는 밸런스 게임</div>
+      <h1>당신의 선택은?<br><span class="g">밸런스 게임</span></h1>
+      <p>정답은 없다. 진짜 고민되는 <b>5:5</b>만 골랐다. <b>맛</b>을 고르고 시작하세요.</p>
+    </div>
+    <div class="flavors">
+      <div class="flavor mild" onclick="pickFlavor('mild')">
+        <div class="badge">ALL 전체이용</div>
+        <div class="em">🥗</div>
+        <h2>순한맛</h2>
+        <div class="d">누구나 편하게 · 인생·사랑·돈·시간<br>고민되는 밸런스 100문항</div>
+      </div>
+      <div class="flavor spicy" onclick="pickFlavor('spicy')">
+        <div class="badge">🔞 19+</div>
+        <div class="em">🌶️</div>
+        <h2>매운맛</h2>
+        <div class="d">성인 전용 · 자극적이고 화끈한<br>심장 쫄깃 밸런스 100문항</div>
+      </div>
+    </div>
+    <div class="startfoot">
+      각 맛마다 <b>10개 배경 × 10문항 = 100문항</b> · 하루 1~2배경씩 돌리면 일주일 컨텐츠<br>
+      🅰🅱 투표로 방청·채팅 표 집계 → 👁 결과 공개로 %를 보여주세요
+    </div>
+  </div>
+
+  <!-- HOME: theme grid -->
+  <div id="home">
+    <div class="homehead">
+      <button class="btn ghost sm" onclick="goStart()">‹ 맛 바꾸기</button>
+      <h2 id="homeTitle">배경 선택</h2>
+      <span class="flavorPill" id="flavorPill">순한맛</span>
+    </div>
+    <div class="themes" id="themeGrid"></div>
+    <div class="credit" id="homeCredit"></div>
+  </div>
+
+  <!-- GAME -->
+  <div id="game">
+    <div class="gtop">
+      <button class="btn ghost sm" onclick="goHome()">‹ 배경</button>
+      <div class="chip" id="themeChip">🎬 배경</div>
+      <div class="sp" style="flex:1"></div>
+      <div class="counter"><span class="cur" id="qCur">1</span><span class="tot" id="qTot"> / 10</span></div>
+    </div>
+    <div class="progress"><i id="progBar"></i></div>
+
+    <div class="arena" id="arena">
+      <div class="side a" id="sideA" onclick="vote('a')">
+        <div class="tag">A</div><div class="q" id="qA">…</div><div class="pct" id="pctA">50%</div>
+      </div>
+      <div class="mid"><div class="vsbadge">VS</div></div>
+      <div class="side b" id="sideB" onclick="vote('b')">
+        <div class="tag">B</div><div class="q" id="qB">…</div><div class="pct" id="pctB">50%</div>
+      </div>
+    </div>
+
+    <div class="votebar" id="voteBar"><div class="va" id="barA"></div><div class="vb" id="barB"></div></div>
+
+    <div class="controls">
+      <button class="vbtn a" onclick="vote('a')">🅰 투표 <span id="cA" style="opacity:.75">0</span></button>
+      <button class="btn" id="btnReveal">👁 결과 보기</button>
+      <button class="btn ghost" onclick="resetVotes()">↺ 초기화</button>
+      <button class="vbtn b" onclick="vote('b')">🅱 투표 <span id="cB" style="opacity:.75">0</span></button>
+    </div>
+    <div class="controls" style="margin-top:10px">
+      <button class="btn" id="btnPrev">‹ 이전</button>
+      <div class="cnt" id="navCnt">1 / 10</div>
+      <button class="btn" id="btnNext">다음 ›</button>
+    </div>
+    <div class="hint">클릭/<kbd>A</kbd><kbd>B</kbd> 투표 · <kbd>Space</kbd> 결과 · <kbd>←</kbd><kbd>→</kbd> 이동 · <kbd>Esc</kbd> 뒤로</div>
+    <div class="credit" id="gameCredit"></div>
+  </div>
+</div>
+
+<!-- AGE GATE -->
+<div class="modal" id="ageGate">
+  <div class="modalbox">
+    <div class="em">🔞</div>
+    <h3>매운맛은 19세 이상 전용</h3>
+    <p>자극적이고 성인 대상의 문항이 포함됩니다.<br>만 19세 이상이신가요?</p>
+    <div class="row">
+      <button class="btn ghost" onclick="closeGate()">아니요</button>
+      <button class="btn warn" onclick="confirmAdult()">네, 성인입니다</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   ⚙️  채널 링크 설정 — 여기 3줄만 실제 주소로 바꾸면 됩니다
+   ============================================================ */
+const CONFIG = {
+  channelName: "쮸래기",
+  links: {
+    forest : "https://www.sooplive.com/station/2seulli",              // 쮸래기 숲(SOOP)
+    youtube: "https://www.youtube.com/@__chubabe",                    // 유튜브
+    chzzk  : "https://chzzk.naver.com/f5d624520cd161920141bc8d661ba214" // 치지직
+  }
+};
+
+/* ================= 순한맛 100문항 ================= */
+const MILD = [
+ {name:"사랑 vs 돈", emoji:"💘", color:"#ff4d6d", q:[
+  ["평생 연봉 3억인데 사람들이 은근히 나를 무시한다","연봉 3천인데 모두가 나를 진심으로 존경한다"],
+  ["돈은 평생 안 부족한데 사랑하는 사람과 매년 3개월은 무조건 떨어져 산다","돈은 늘 빠듯한데 사랑하는 사람과 하루도 안 떨어진다"],
+  ["로또 20억 당첨인데 배우자가 그 돈 때문에 결혼한 걸 평생 안다","돈은 없지만 배우자가 순수하게 나만 사랑한다는 확신이 있다"],
+  ["연인이 나보다 10배 부자라서 평생 얹혀사는 느낌","내가 연인보다 10배 부자라서 평생 이용당하는 건 아닌지 의심한다"],
+  ["첫사랑과 재회하는데 나는 빚더미","관심 없는 사람과 결혼하면 평생 경제적 풍요"],
+  ["사랑하는 사람의 빚 5억을 내가 다 갚아준다","그 사람과 헤어지고 대신 5억을 받는다"],
+  ["가족이 부자인데 나를 통제한다","가족이 가난한데 나를 완전히 존중한다"],
+  ["배우자가 돈은 잘 버는데 애정 표현이 0이다","배우자가 돈은 못 버는데 매일 사랑받는 느낌이다"],
+  ["친구 10명이 다 나보다 잘살아서 만날 때마다 위축된다","친구 10명이 다 나보다 못살아서 만날 때마다 돈이 나간다"],
+  ["평생 돈 걱정 없지만 내가 사랑하는 사람은 나를 안 사랑한다","평생 가난하지만 서로 죽고 못 사는 사랑을 한다"],
+ ]},
+ {name:"과거 vs 미래", emoji:"⏳", color:"#8b5cf6", q:[
+  ["내 흑역사 딱 1개를 완전히 지운다","미래에 나한테 일어날 대형 사고 1번을 미리 안다"],
+  ["과거로 돌아가 딱 하루를 다시 산다 (기억 유지)","미래의 하루를 미리 딱 하루 본다"],
+  ["내 인생 최고의 순간을 다시 한 번 겪는다","내 인생 최악의 순간을 없던 일로 만든다"],
+  ["첫사랑과 헤어진 그 순간으로 돌아간다","앞으로 만날 마지막 사랑이 누구인지 미리 안다"],
+  ["죽은 사람과 딱 10분 대화한다","10년 뒤 내 모습을 10분간 관찰한다"],
+  ["과거의 실수 하나를 되돌리는 대신 좋은 기억도 하나 사라진다","미래의 행운 하나를 확정하는 대신 나쁜 일도 하나 확정된다"],
+  ["3년 전으로 돌아가되 지금 기억을 다 잃는다","지금 그대로인데 3년 뒤의 기억을 지금 갖는다"],
+  ["내가 태어나기 전, 부모님의 젊은 시절 하루를 본다","내가 죽은 뒤, 내 장례식을 본다"],
+  ["후회되는 선택 딱 하나를 바꾼다 (대신 지금 인연이 다 리셋)","지금 인연을 유지하되 그 후회를 평생 안고 간다"],
+  ["인류의 100년 뒤 미래를 본다","내 개인의 10년 뒤 미래를 본다"],
+ ]},
+ {name:"몸과 능력", emoji:"🧬", color:"#22c55e", q:[
+  ["뭘 먹어도 살 안 찌는데 항상 배고프다","적게 먹어도 배부른데 물만 마셔도 살찐다"],
+  ["잠을 안 자도 안 피곤한데 평생 꿈을 못 꾼다","12시간 자야 하는데 매일 완벽한 숙면을 한다"],
+  ["어떤 상처도 3초 만에 낫는데 통증은 10배로 느낀다","통증을 아예 못 느끼는데 상처가 안 낫는다"],
+  ["아무 언어나 완벽히 알아듣는데 나는 말을 못 한다","어떤 언어든 유창하게 말하는데 남의 말은 못 알아듣는다"],
+  ["힘이 장사인데 손끝 감각이 없다","손재주가 신급인데 힘이 어린애 수준이다"],
+  ["100m를 5초에 뛰는데 그 뒤 하루종일 못 움직인다","평생 걷기만 가능한데 절대 안 지친다"],
+  ["기억력이 완벽한데 나쁜 기억도 절대 안 잊힌다","기억력이 나쁜데 트라우마도 금방 잊는다"],
+  ["미각이 신급인데 뭘 먹어도 3초 뒤 맛이 사라진다","미각이 둔한데 맛의 여운이 1시간 간다"],
+  ["목소리로 사람을 홀리는데 하루 100단어만 말할 수 있다","말은 무제한인데 목소리가 평생 쇳소리다"],
+  ["시력 10.0인데 눈부심에 극도로 약하다","시력 0.5인데 어둠 속에서도 잘 본다"],
+ ]},
+ {name:"관계 지옥", emoji:"💔", color:"#f97316", q:[
+  ["연인이 과거에 전 애인 100명과 다 잤다","연인이 미래에 나 몰래 딱 1명과 바람피운다 (못 막음)"],
+  ["배우자가 원래 내 절친을 더 좋아했는데 나랑 결혼했다","내가 원래 배우자의 절친을 더 좋아했는데 배우자랑 결혼했다"],
+  ["연인이 매일 사소한 거짓말을 한다","연인이 평생 단 한 번의 큰 거짓말을 한다"],
+  ["시댁/처가는 완벽한데 배우자가 별로다","배우자는 완벽한데 시댁/처가가 지옥이다"],
+  ["내 친구들이 다 내 연인을 싫어한다","내 연인이 내 친구들을 다 싫어한다"],
+  ["연인이 나보다 훨씬 인기 많아서 늘 불안하다","내가 연인보다 훨씬 인기 많아서 늘 미안하다"],
+  ["헤어진 전 연인이 나보다 훨씬 잘됐다","헤어진 전 연인이 나 때문에 폐인이 됐다"],
+  ["배우자와 취향이 100% 똑같아서 새로움이 전혀 없다","취향이 100% 반대라서 매번 싸운다"],
+  ["연인이 나한테만 차갑고 남한테는 다정하다","연인이 나한테만 다정하고 남한테는 무례하다"],
+  ["평생 연애는 화려한데 결혼은 못 한다","연애 경험 0인데 첫 상대와 평생 행복한 결혼을 한다"],
+ ]},
+ {name:"디지털 시대", emoji:"📱", color:"#06b6d4", q:[
+  ["내 검색기록 전부가 5초간 전광판에 뜬다","내 카톡 대화 전체가 친구들 단톡방에 영구 공개된다"],
+  ["내 사진첩 전체를 부모님이 본다","내 통화·문자 기록 전체를 연인이 본다"],
+  ["내 연봉이 모든 지인에게 공개된다","내 연애 이력 전부가 모든 지인에게 공개된다"],
+  ["하루 동안 내 모든 생각이 자막으로 뜬다","일주일 동안 내가 한 거짓말이 다 밝혀진다"],
+  ["SNS 팔로워 100만인데 익명 악플이 매일 1000개 온다","팔로워 0명인데 아무도 나를 모른다"],
+  ["내 인터넷 활동 전부가 정부에 공개된다","내 건강정보 전부가 회사에 공개된다"],
+  ["죽을 때 내 스마트폰이 자동으로 모두에게 공개된다","살아있는 동안 매년 하루, 랜덤으로 공개된다"],
+  ["내가 한 모든 뒷담화가 당사자에게 전송된다","나에 대한 모든 뒷담화가 나에게 전송된다"],
+  ["내 얼굴이 딥페이크로 아무 데나 쓰여도 막을 수 없다","내 목소리가 복제돼 아무 데나 쓰여도 막을 수 없다"],
+  ["평생 온라인에서 익명 불가(실명 강제)","평생 오프라인에서 아무도 내 얼굴을 기억 못 한다"],
+ ]},
+ {name:"외모 vs 인생", emoji:"🪞", color:"#ec4899", q:[
+  ["얼굴은 연예인급인데 목소리가 방귀소리다","목소리는 성우급인데 얼굴이 평생 무표정으로 고정된다"],
+  ["남들 눈엔 완벽한 외모인데 거울 속 나는 못생겨 보인다","남들 눈엔 못생겼는데 거울 속 나는 완벽해 보인다"],
+  ["20대 외모로 평생 사는데 정신은 급격히 늙는다","정신은 평생 20대인데 외모는 남들 2배로 늙는다"],
+  ["키가 원하는 만큼 크는데 매년 1cm씩 저절로 작아진다","키는 딱 평균인데 절대 안 변한다"],
+  ["웃을 때만 세상에서 제일 매력적이다","무표정일 때만 세상에서 제일 매력적이다"],
+  ["첫인상이 최악인데 알수록 반한다","첫인상이 최고인데 알수록 실망한다"],
+  ["사진은 늘 잘 나오는데 실물이 아쉽다","실물은 훈훈한데 사진이 늘 최악이다"],
+  ["특정 각도에서만 극도로 잘생김/예쁨","모든 각도에서 딱 무난하다"],
+  ["옷발이 신급인데 벗으면 실망이다","몸은 좋은데 뭘 입어도 안 어울린다"],
+  ["평생 젊고 예쁜데 아무도 나를 진지하게 안 본다","평생 늙어 보이는데 어딜 가나 신뢰받는다"],
+ ]},
+ {name:"시간과 삶", emoji:"⏰", color:"#eab308", q:[
+  ["하루 4시간만 자면 평생 안 피곤하다","하루 12시간 자야 하는데 자는 동안 세상에서 제일 행복한 꿈을 꾼다"],
+  ["하루가 48시간인데 남들보다 2배 빨리 늙는다","하루가 12시간인데 남들 절반 속도로 늙는다"],
+  ["내 수명을 정확히 미리 안다","절대 모르는데 언제든 갑자기 끝날 수 있다"],
+  ["원하는 순간 시간을 정지시키는데 정지한 만큼 내 수명이 깎인다","시간 조종은 못 하는데 남들보다 20년 더 산다"],
+  ["인생을 2배 속도로 빨리 살며 90년어치를 경험한다","인생을 절반 속도로 느리게 살며 45년어치를 90년간 겪는다"],
+  ["매일 아침 기억이 리셋되지만 몸은 평생 건강하다","기억은 완벽한데 몸이 매일 조금씩 안 좋아진다"],
+  ["좋아하는 일만 하며 40년을 산다","하기 싫은 일을 참으며 80년을 산다"],
+  ["딱 30살에서 나이가 멈추는데 주변 사람은 다 늙어 떠난다","남들과 똑같이 늙는데 끝까지 함께한다"],
+  ["하루 1시간을 과거의 특정 날로 순간이동해 다시 산다","하루 1시간을 미래로 가서 미리 산다"],
+  ["시간을 되감을 수 있는데 딱 1분씩, 평생 3번뿐이다","못 되감는데 대신 중요한 순간마다 직감이 100% 맞는다"],
+ ]},
+ {name:"진실과 거짓", emoji:"🎭", color:"#14b8a6", q:[
+  ["내가 하는 모든 말이 무조건 진실이어야 한다 (거짓말 불가)","남이 나한테 하는 말의 진실/거짓이 다 보이는데, 아는 걸 티내면 죽는다"],
+  ["누구든 나한테는 거짓말을 못 한다","나는 누구한테도 절대 안 들키는 거짓말을 할 수 있다"],
+  ["내 생각이 다 얼굴에 드러난다","남의 생각이 다 내게 들리는데 끌 수 없다"],
+  ["평생 진실만 듣는데 대부분 잔인하다","평생 듣기 좋은 말만 듣는데 대부분 거짓이다"],
+  ["내가 한 약속은 무조건 지켜야 한다 (못 지키면 큰일 난다)","남이 나한테 한 약속은 무조건 지켜지는데, 내 약속엔 효력이 없다"],
+  ["진심을 말하면 상대가 항상 오해한다","거짓을 말하면 상대가 항상 진심으로 믿는다"],
+  ["세상 모든 비밀을 알 수 있는데 하나라도 발설하면 죽는다","아무 비밀도 모르지만 평생 마음이 편하다"],
+  ["내 진짜 속마음을 딱 1명은 완벽히 안다","아무도 내 속마음을 모르는데, 나도 남 속마음을 영영 모른다"],
+  ["거짓말할 때마다 코가 커지는 몸이 된다","진실을 말할 때마다 통증이 오는 몸이 된다"],
+  ["나를 아는 모두가 나를 오해하는데 진실은 나만 안다","모두가 나를 정확히 아는데 그게 부끄러운 진짜 모습이다"],
+ ]},
+ {name:"돈의 함정", emoji:"💰", color:"#f59e0b", q:[
+  ["매일 통장에 100만원이 꽂히는데 하루 안에 다 못 쓰면 소멸된다","한 번에 10억인데 그 돈 받는 순간 가장 친한 친구가 나를 손절한다"],
+  ["통장에 늘 10억이 있는데 절대 못 뺀다 (숫자만 본다)","지금 당장 1억 현금인데 그게 끝이다"],
+  ["원하는 물건은 다 공짜인데 남에게 절대 못 주고 못 판다","다 돈 주고 사야 하는데 뭐든 되팔 수 있다"],
+  ["내가 쓴 돈이 다음 날 2배로 돌아온다. 단 남을 위해 쓰면 안 돌아온다","내가 쓴 돈은 안 돌아오는데, 남을 위해 쓰면 3배로 돌아온다"],
+  ["연봉 10억인데 52주 내내 하루도 못 쉰다","연봉 5천인데 반년 일하고 반년 쉰다"],
+  ["죽을 때까지 매달 월급 300이 보장된다 (절대 안 늘어남)","성공하면 월 3000, 망하면 0인 도박을 한다 (반반)"],
+  ["내 재산이 항상 지인 평균과 똑같이 맞춰진다","내 재산이 항상 지인 중 꼴찌보다 딱 10% 많다"],
+  ["100억이 있는데 매년 재산의 절반이 사라진다","1억이 있는데 매년 재산이 10%씩 늘어난다"],
+  ["원하는 만큼 벌 수 있는데 번 돈의 딱 절반은 반드시 기부해야 한다","딱 먹고살 만큼만 버는데 100% 내 것이다"],
+  ["유산 50억을 받는데 평생 일하면 안 된다 (일하면 몰수)","유산은 0인데 내가 번 만큼 다 갖는다"],
+ ]},
+ {name:"궁극의 딜레마", emoji:"🌌", color:"#6366f1", q:[
+  ["모두가 나를 좋아하는데 나는 아무도 진심으로 사랑 못 한다","나는 모두를 사랑하는데 아무도 나를 좋아하지 않는다"],
+  ["세상을 구할 수 있는데 아무도 그 사실을 모른다 (무명의 영웅)","아무것도 안 했는데 세상이 나를 영웅으로 기억한다"],
+  ["완벽하게 행복한데 그게 가짜인 걸 나만 안다","고통스러운데 그게 진짜 현실이다"],
+  ["내 최고의 재능으로 세상에 기여하는데 나는 불행하다","재능 없이 평범한데 나는 행복하다"],
+  ["딱 한 사람을 완벽히 행복하게 하는데 나머지는 다 불행하다","모두를 조금씩 행복하게 하는데 완전히 행복한 사람은 없다"],
+  ["죽을 때 내 인생이 최고의 명작 영화로 상영된다 (나는 못 본다)","사는 내내 평범한데 스스로는 만족한다"],
+  ["내가 없으면 세상이 조금 더 나빠진다 (내가 꼭 있어야 한다)","내가 있으나 없으나 세상은 똑같다 (완전히 자유롭다)"],
+  ["모든 걸 다 이해하는데 아무것도 못 바꾼다","아무것도 이해 못 하는데 뭐든 바꿀 수 있다"],
+  ["후회 하나 없는 안전한 삶","반은 후회하지만 반은 짜릿한 삶"],
+  ["내가 세상에서 제일 특별한데 그걸 증명할 방법이 없다","지극히 평범한데 모두가 나를 특별하다고 믿는다"],
+ ]},
+];
+
+/* ================= 매운맛 100문항 (19+) ================= */
+const SPICY = [
+ {name:"이불킥 흑역사", emoji:"🙈", color:"#ff4d6d", q:[
+  ["술 취해 전 애인한테 보낸 낯뜨거운 카톡이 단톡방에 공개된다","내 폰 사진첩 '숨김 폴더'가 5초간 공개된다"],
+  ["첫 키스 상대와 다시 만난다","첫 경험 상대와 다시 만난다"],
+  ["내 이성 관련 검색기록이 가족 단톡방에 뜬다","친구 단톡방에 뜬다"],
+  ["지금까지 만난 사람 수를 지금 애인에게 솔직히 말한다","지금 애인의 그 숫자를 정확히 듣는다"],
+  ["취중에 저지른 흑역사 하룻밤을 모두가 안다","아무도 모르는데 나 혼자 평생 곱씹는다"],
+  ["내 잠꼬대가 전부 녹음돼 애인이 듣는다","애인 잠꼬대를 내가 다 듣는다"],
+  ["내 진짜 이성 취향이 이마에 자막으로 뜬다","상대가 나를 어떻게 생각하는지 자막으로 뜬다"],
+  ["첫사랑에게 차인 진짜 이유를 정확히 듣는다","앞으로 차일 이유를 미리 안다"],
+  ["안 읽씹당한 내 고백 문자가 전광판에 뜬다","나를 짝사랑하다 포기한 사람 명단이 공개된다"],
+  ["내 연애사가 다큐로 제작돼 지인들이 본다","지인들 연애사 다큐를 내가 본다"],
+ ]},
+ {name:"전 애인", emoji:"💋", color:"#e0245e", q:[
+  ["전 애인 전부가 아직 나를 못 잊는다","나만 전 애인 전부를 아직 못 잊는다"],
+  ["지금 애인이 전 애인과 아직 연락한다 (선은 안 넘음)","내가 전 애인과 연락하는 걸 지금 애인이 안다"],
+  ["전 애인이 나보다 훨씬 잘난 사람과 결혼한다","전 애인이 나 없이는 못 산다며 매달린다"],
+  ["헤어진 전 애인과 딱 하룻밤","오래 짝사랑했던 사람과 딱 하룻밤"],
+  ["전 애인과의 뜨거운 추억이 다 지워진다","다 남는데 지금 애인이 그걸 다 안다"],
+  ["지금 애인이 내 전 애인을 직접 만나 대화한다","내가 지금 애인의 전 애인을 만나 대화한다"],
+  ["내 결혼식에 전 애인이 하객으로 온다","전 애인 결혼식에 내가 초대받아 간다"],
+  ["전 애인 SNS를 평생 못 본다","매일 강제로 봐야 한다"],
+  ["나랑 헤어진 사람들은 다 더 좋은 사람을 만난다","나랑 헤어진 사람들은 다 연애를 접는다"],
+  ["전 애인들이 매긴 나의 점수가 공개된다","내가 매긴 전 애인 점수가 그들에게 공개된다"],
+ ]},
+ {name:"은밀한 취향", emoji:"🌶️", color:"#ff5c8a", q:[
+  ["내 은밀한 취향이 애인에게 전부 공개된다","애인의 취향을 내가 전부 알게 된다"],
+  ["나에 대한 평가가 전 애인들 단톡방에 공유된다","그 평가를 내가 직접 듣는다"],
+  ["애인과 취향이 100% 안 맞는다","취향은 완벽한데 대화가 1도 안 통한다"],
+  ["평생 한 사람하고만, 완벽한 궁합","다양하게 만나는데 궁합은 복불복"],
+  ["내 야한 상상이 하루 한 번 얼굴에 티 난다","남의 야한 상상이 다 보인다 (끄기 불가)"],
+  ["내 '성인용 검색기록'이 애인에게 공개된다","애인 것을 내가 보게 된다"],
+  ["첫날밤 상대가 역대 최고였다","마지막이 될 상대가 역대 최고다"],
+  ["매력은 폭발인데 스킨십이 서툴다","스킨십은 프로인데 매력이 평범하다"],
+  ["애인이 나 말고 딱 한 명을 계속 상상한다","내가 애인 말고 딱 한 명을 계속 상상한다"],
+  ["내 은밀한 습관이 몰래카메라로 방송된다","남의 것을 관찰자로 지켜본다"],
+ ]},
+ {name:"들키면 끝", emoji:"🫣", color:"#f97316", q:[
+  ["이성 친구와 단둘이 여행 간 게 애인에게 들킨다","애인이 그런 여행을 다녀온 걸 내가 알게 된다"],
+  ["내 폰 알림이 애인 앞에서 24시간 소리로 다 읽힌다","애인 폰 알림을 내가 24시간 다 듣는다"],
+  ["술자리 실수 스킨십이 CCTV에 찍혔다","애인의 그 장면을 내가 보게 된다"],
+  ["바람 딱 한 번을 완전범죄로 넘긴다 (평생 안 들킴)","절대 안 했는데 애인이 평생 했다고 의심한다"],
+  ["이성한테 온 '자니?' 문자를 애인이 본다","애인한테 온 그 문자를 내가 본다"],
+  ["내 SNS 비밀계정이 공개된다","애인의 비밀계정을 내가 발견한다"],
+  ["클럽·술집 출입기록이 애인에게 전송된다","애인 것을 내가 받는다"],
+  ["예전에 저장해둔 이성 사진첩이 애인에게 발각된다","애인 것을 내가 발견한다"],
+  ["내가 몰래 '좋아요' 누른 게시물 전부가 애인에게 공개된다","애인 것이 내게 공개된다"],
+  ["딱 한 번의 실수를 자백하면 용서받는다","자백 안 하면 평생 죄책감으로 산다"],
+ ]},
+ {name:"유혹", emoji:"😈", color:"#d946ef", q:[
+  ["세상에서 제일 매력적인 사람이 나를 유혹한다 (나는 애인 있음)","내가 세상에서 제일 매력적인데 아무도 안 넘어온다"],
+  ["연예인 이상형이 딱 하루 내 애인이 된다 (비밀 보장)","내 애인이 연예인 이상형과 하루를 보낸다 (비밀 보장)"],
+  ["아무리 매력적인 유혹도 절대 못 참는 몸이 된다","아무리 매력적이어도 설렘이 0인 몸이 된다"],
+  ["모두가 나에게 반하는데 나는 아무에게도 안 설렌다","나는 모두에게 설레는데 아무도 나에게 안 반한다"],
+  ["애인이 매일 다른 사람에게 대시받는 걸 내가 본다","내가 매일 대시받는 걸 애인이 다 본다"],
+  ["딱 한 번, 아무 죄책감 없는 일탈","평생 완벽한 정절인데 늘 참아야 한다"],
+  ["이상형이 눈앞에 있는데 손잡으면 애인이 즉시 안다","손 안 잡는데 애인은 잡았다고 오해한다"],
+  ["유혹에 넘어가면 인생 대박, 안 넘어가면 평범","안 넘어가면 안전, 넘어가면 파멸"],
+  ["내가 유혹의 달인인데 진심은 못 얻는다","유혹은 서툰데 진심은 늘 통한다"],
+  ["세상 모든 사람과 썸은 타는데 연애는 못 한다","딱 한 명하고만, 대신 평생 사랑한다"],
+ ]},
+ {name:"몸과 매력", emoji:"🔥", color:"#fb7185", q:[
+  ["얼굴은 최상위인데 밤엔 최하위다","얼굴은 평범한데 밤엔 최상위다"],
+  ["옷 입으면 최고인데 벗으면 실망이다","벗으면 최고인데 옷발이 안 산다"],
+  ["애인이 내 몸을 남들과 몰래 비교한다","내가 애인 몸을 남들과 비교하는 게 티 난다"],
+  ["평생 지금 몸매를 유지하는데 스킨십 감각이 절반이다","몸매는 관리해야 하는데 감각은 2배다"],
+  ["향기로 사람을 홀리는데 얼굴이 평범하다","얼굴은 최고인데 체취가 최악이다"],
+  ["내 몸에 대한 애인의 솔직한 점수를 듣는다","애인 몸에 대한 내 점수가 애인에게 전달된다"],
+  ["매력이 밤에만 폭발한다","매력이 낮에만 폭발한다"],
+  ["목소리가 반칙급으로 섹시한데 얼굴이 안 따라준다","얼굴은 되는데 목소리가 확 깬다"],
+  ["손길이 예술인데 성격이 무뚝뚝하다","다정한데 손길이 서툴다"],
+  ["평생 매력 만점인데 진심은 늘 의심받는다","매력은 평범한데 늘 진심으로 사랑받는다"],
+ ]},
+ {name:"썸·원나잇", emoji:"🌙", color:"#a855f7", q:[
+  ["인생 최고의 하룻밤인데 다음 날 남남이 된다","평범한데 평생 함께한다"],
+  ["화려한 썸만 100번","진심 연애 1번인데 평생 간다"],
+  ["하룻밤 상대가 알고 보니 지인이었다","지인이 알고 보니 내 애인의 전 상대였다"],
+  ["이름도 모르는 최고의 만남","다 아는 사이의 무난한 만남"],
+  ["썸 타던 사람이 내 절친과 잘된다","내 절친이 썸 타던 사람과 내가 잘된다"],
+  ["원나잇이 평생 비밀로 남는다","진지한 연애가 3개월 만에 온 동네에 소문난다"],
+  ["지금 애인이 원나잇으로 시작됐다","지금 애인이 10년 친구에서 시작됐다"],
+  ["짜릿한데 평생 죄책감이 남는다","안전한데 평생 심심하다"],
+  ["썸의 설렘만 평생 느끼는데 결실은 없다","결실은 있는데 설렘은 초반뿐이다"],
+  ["모두와 하룻밤은 가능한데 두 번은 안 된다","딱 한 사람하고만 평생 함께한다"],
+ ]},
+ {name:"질투의 늪", emoji:"👀", color:"#f43f5e", q:[
+  ["애인의 전 애인이 나보다 모든 면에서 낫다","내 전 애인이 애인보다 모든 면에서 낫다"],
+  ["애인이 이성 친구가 100명인데 다 순수한 친구","애인이 이성 친구는 0명인데 나를 늘 의심한다"],
+  ["애인이 자니는 자는데 자면서 다른 사람 이름을 부른다","애인이 나만 부르는데 그게 잠꼬대 연기다"],
+  ["애인 폰에 내가 모르는 이성이 즐겨찾기 돼 있다","내 폰에 그런 게 있는 걸 애인이 발견한다"],
+  ["애인이 첫사랑을 아직도 SNS로 지켜본다","내가 첫사랑을 지켜보는 걸 애인이 안다"],
+  ["애인이 나보다 전 애인이랑 더 잘 맞았다고 인정한다","내가 전 애인이랑 더 잘 맞았던 걸 애인이 눈치챈다"],
+  ["애인이 나 몰래 이성과 술을 마신다 (아무 일 없음)","내가 그러는 걸 애인이 안다 (아무 일 없음)"],
+  ["애인이 매력적인 사람만 보면 대놓고 쳐다본다","내가 그러는 걸 애인이 매번 잡아낸다"],
+  ["애인의 이상형이 딱 나의 정반대다","나의 이상형이 딱 애인의 정반대다"],
+  ["애인이 헤어진 뒤에도 나를 최고로 기억한다","내가 헤어진 뒤에도 애인을 최고로 기억한다"],
+ ]},
+ {name:"위험한 제안", emoji:"🍷", color:"#ef4444", q:[
+  ["하룻밤에 1억, 단 애인이 평생 그 사실을 안다","평생 순정, 단 늘 가난하다"],
+  ["매력이 폭발해 누구든 유혹 가능, 단 진짜 사랑은 못 함","매력은 없지만 운명의 한 사람을 반드시 만남"],
+  ["원하는 이성 누구든 하루 내 것, 단 다음 날 기억 삭제","평생 한 사람인데 기억은 영원히 남음"],
+  ["세상 모든 사람이 나에게 반하는 향수, 단 진심은 사라짐","아무 능력 없는데 딱 한 명이 나에게 미침"],
+  ["연예인과 비밀 연애 1년, 단 끝나면 모두가 나를 조롱","평범한 사람과 평생, 아무도 관심 없음"],
+  ["최고의 밤을 평생, 단 대화는 평생 0","최고의 대화를 평생, 단 스킨십은 평생 0"],
+  ["누구든 내 매력에 빠지는데 3일 뒤 식는다","아무도 안 빠지는데 한 번 빠지면 평생 간다"],
+  ["딱 한 명과 완벽한 궁합, 단 성격 최악","성격은 천사인데 궁합은 최악"],
+  ["원할 때마다 새 상대, 단 정 붙일 수 없는 몸","정은 깊은데 평생 한 명뿐"],
+  ["뜨거운 비밀 연애, 단 들키면 인생 끝","공개 연애 안정적인데 설렘이 없다"],
+ ]},
+ {name:"극한의 매운맛", emoji:"💦", color:"#dc2626", q:[
+  ["내 야한 상상 전부가 영상으로 재생돼 공개된다","남의 것을 내가 다 봐야 한다 (끄기 불가)"],
+  ["평생 애인과 뜨거운데 대화가 0이다","대화는 최고인데 스킨십이 0이다"],
+  ["나에 대한 남들의 은밀한 평가가 실명으로 내게 온다","내가 남들에게 매긴 평가가 실명으로 전달된다"],
+  ["첫날밤 실력이 방송 심사대에 오른다","남의 것을 심사위원으로 평가한다"],
+  ["내 야한 꿈 내용이 매일 애인에게 전송된다","애인 것이 매일 내게 전송된다"],
+  ["세상에서 제일 뜨거운 연애인데 사랑은 없다","사랑은 뜨거운데 스킨십은 식었다"],
+  ["내 취향을 100% 아는 완벽한 타인","취향은 모르지만 나를 진심으로 사랑하는 사람"],
+  ["평생 파트너는 최상급인데 얼굴을 못 본다 (늘 어둠)","얼굴은 보는데 합은 복불복이다"],
+  ["은밀한 판타지 하나가 이뤄지는데 온 동네에 소문난다","아무것도 안 이뤄지는데 완벽한 비밀이 지켜진다"],
+  ["모두가 탐내는 몸인데 마음은 늘 공허하다","평범한 몸인데 매일 사랑으로 충만하다"],
+ ]},
+];
+
+/* ================= 상태/로직 ================= */
+let flavor = 'mild';
+let mode = null;      // 'theme' | 'shuffle'
+let curTheme = 0, idx = 0;
+let flat = [];
+const votes = {};
+const $ = id => document.getElementById(id);
+const DATA = ()=> flavor==='spicy' ? SPICY : MILD;
+
+/* ---- channel links ---- */
+function renderChannels(target, big){
+  const L = CONFIG.links;
+  const items = [
+    {u:L.forest, cls:'forest', em:'🌲', t:'쮸래기 숲'},
+    {u:L.youtube, cls:'yt', em:'▶️', t:'유튜브'},
+    {u:L.chzzk, cls:'chz', em:'🎥', t:'치지직'},
+  ];
+  target.innerHTML = items.map(i=>`<a class="${i.cls}" href="${i.u}" target="_blank" rel="noopener" title="${i.t}">${i.em}</a>`).join('');
+}
+
+/* ---- navigation ---- */
+function pickFlavor(f){
+  if(f==='spicy'){ $("ageGate").classList.add('on'); return; }
+  flavor='mild'; document.body.classList.remove('spicy');
+  enterHome();
+}
+function confirmAdult(){
+  $("ageGate").classList.remove('on');
+  flavor='spicy'; document.body.classList.add('spicy');
+  enterHome();
+}
+function closeGate(){ $("ageGate").classList.remove('on'); }
+
+function enterHome(){
+  $("start").style.display="none"; $("home").classList.add("on"); $("game").classList.remove("on");
+  $("flavorPill").textContent = flavor==='spicy' ? '🌶️ 매운맛 19+' : '🥗 순한맛';
+  $("flavorPill").className = 'flavorPill '+flavor;
+  $("homeTitle").textContent = "배경 선택";
+  renderHome();
+}
+function goStart(){
+  $("start").style.display="flex"; $("home").classList.remove("on"); $("game").classList.remove("on");
+}
+function goHome(){ $("game").classList.remove("on"); $("home").classList.add("on"); }
+
+function renderHome(){
+  const grid=$("themeGrid"); grid.innerHTML="";
+  const sc=document.createElement('div'); sc.className="tcard shuffleCard";
+  sc.innerHTML=`<div class="em">🔀</div><h3>전체 랜덤 100</h3><div class="sub">${flavor==='spicy'?'매운맛':'순한맛'} 100문항 섞기</div><div class="num">100</div>`;
+  sc.onclick=()=>startShuffle();
+  grid.appendChild(sc);
+  DATA().forEach((t,i)=>{
+    const c=document.createElement('div'); c.className="tcard";
+    c.innerHTML=`<div class="em">${t.emoji}</div><h3>${t.name}</h3><div class="sub">고민되는 5:5 · 10문항</div>
+      <div class="num">${String(i+1).padStart(2,'0')}</div><div class="bar" style="background:${t.color}"></div>`;
+    c.onclick=()=>startTheme(i);
+    grid.appendChild(c);
+  });
+}
+function startTheme(i){ mode='theme'; curTheme=i; idx=0; $("home").classList.remove("on"); $("game").classList.add("on"); render(); }
+function startShuffle(){
+  mode='shuffle'; idx=0; flat=[];
+  DATA().forEach((t,ti)=> t.q.forEach((q,qi)=> flat.push({ti,qi})));
+  for(let k=flat.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [flat[k],flat[j]]=[flat[j],flat[k]]; }
+  $("home").classList.remove("on"); $("game").classList.add("on"); render();
+}
+function current(){
+  if(mode==='shuffle'){ const f=flat[idx]; return {t:DATA()[f.ti], ti:f.ti, qi:f.qi, q:DATA()[f.ti].q[f.qi]}; }
+  return {t:DATA()[curTheme], ti:curTheme, qi:idx, q:DATA()[curTheme].q[idx]};
+}
+function total(){ return mode==='shuffle'? flat.length : 10; }
+function keyOf(t,i){ return flavor+"-"+t+"-"+i; }
+
+function render(){
+  const c=current(), tot=total();
+  $("themeChip").innerHTML=`${c.t.emoji} ${c.t.name}`;
+  $("themeChip").style.borderColor=c.t.color+"66";
+  $("qA").textContent=c.q[0]; $("qB").textContent=c.q[1];
+  $("qCur").textContent=idx+1; $("qTot").textContent=" / "+tot;
+  $("navCnt").textContent=(idx+1)+" / "+tot;
+  $("progBar").style.width=((idx+1)/tot*100)+"%";
+  $("arena").classList.remove("revealed");
+  $("sideA").classList.remove("sel"); $("sideB").classList.remove("sel");
+  const v=votes[keyOf(c.ti,c.qi)]||{a:0,b:0};
+  $("cA").textContent=v.a; $("cB").textContent=v.b;
+  updateBar(v);
+}
+function updateBar(v){
+  const t=v.a+v.b, pa=t?Math.round(v.a/t*100):50, pb=100-pa;
+  $("barA").style.width=pa+"%"; $("barB").style.width=pb+"%";
+  $("pctA").textContent=pa+"%"; $("pctB").textContent=pb+"%";
+}
+function vote(side){
+  const c=current(), k=keyOf(c.ti,c.qi);
+  if(!votes[k]) votes[k]={a:0,b:0};
+  votes[k][side]++;
+  $("cA").textContent=votes[k].a; $("cB").textContent=votes[k].b;
+  updateBar(votes[k]);
+  const el=side==='a'?$("sideA"):$("sideB");
+  el.classList.add("sel"); setTimeout(()=>{ if(!$("arena").classList.contains("revealed")) el.classList.remove("sel"); },250);
+}
+function reveal(){
+  const c=current(), k=keyOf(c.ti,c.qi), v=votes[k]||{a:0,b:0};
+  updateBar(v); $("arena").classList.add("revealed");
+  if(v.a>v.b) $("sideA").classList.add("sel"); else if(v.b>v.a) $("sideB").classList.add("sel");
+}
+function resetVotes(){
+  const c=current(), k=keyOf(c.ti,c.qi);
+  votes[k]={a:0,b:0}; $("cA").textContent=0; $("cB").textContent=0;
+  $("arena").classList.remove("revealed"); $("sideA").classList.remove("sel"); $("sideB").classList.remove("sel");
+  updateBar({a:0,b:0});
+}
+function next(){ if(idx<total()-1){ idx++; render(); } }
+function prev(){ if(idx>0){ idx--; render(); } }
+
+/* ---- share / toast ---- */
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),1800); }
+function share(){
+  const url=location.href;
+  if(navigator.share){ navigator.share({title:'쮸래기 밸런스 게임', text:'당신의 선택은? 🔥', url}).catch(()=>{}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>toast('🔗 링크가 복사됐어요!')).catch(()=>toast(url)); }
+  else toast(url);
+}
+
+/* ---- credits ---- */
+function creditHTML(){
+  return `<b>쮸래기 밸런스 게임</b> · 함께 즐기고 자유롭게 공유하세요 🎲<br>
+    🌲 쮸래기 숲 · ▶️ 유튜브 · 🎥 치지직 에서 쮸래기를 만나요`;
+}
+
+/* ---- wire ---- */
+$("btnNext").onclick=next; $("btnPrev").onclick=prev; $("btnReveal").onclick=reveal;
+$("btnShare").onclick=share;
+$("btnFull").onclick=()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+document.addEventListener('keydown', e=>{
+  if(!$("game").classList.contains("on")) return;
+  const k=e.key.toLowerCase();
+  if(e.key==='ArrowRight') next();
+  else if(e.key==='ArrowLeft') prev();
+  else if(e.key===' '){ e.preventDefault(); reveal(); }
+  else if(k==='a') vote('a');
+  else if(k==='b') vote('b');
+  else if(e.key==='Escape') goHome();
+  else if(k==='r') resetVotes();
+});
+
+renderChannels($("chanTop"));
+$("homeCredit").innerHTML=creditHTML();
+$("gameCredit").innerHTML=creditHTML();
+</script>
+</body>
+</html>
