@@ -40,13 +40,24 @@
   .btn.ghost{background:transparent;}
   .btn.sm{padding:6px 10px; font-size:12.5px; border-radius:9px;}
 
-  /* channel links */
-  .chan{display:flex; gap:7px; align-items:center;}
-  .chan a{width:34px;height:34px;border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; text-decoration:none; border:1px solid var(--line); background:var(--ink2); transition:.15s;}
-  .chan a:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.3);}
-  .chan a.forest:hover{background:#1a4d2e;border-color:#2e7d32;}
-  .chan a.yt:hover{background:#3a0d0d;border-color:#ff0000;}
-  .chan a.chz:hover{background:#0a3d2e;border-color:#00ffa3;}
+  /* channel links — top bar (icon only) */
+  .chan{display:flex; gap:8px; align-items:center;}
+  .chan a{width:42px;height:42px;border-radius:12px; display:flex; align-items:center; justify-content:center; text-decoration:none; border:1px solid var(--line); background:var(--ink2); transition:.15s;}
+  .chan a svg{width:26px;height:26px; display:block;}
+  .chan a:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.35);}
+
+  /* prominent channel pills (start screen) */
+  .chanlabel{margin-top:28px; color:var(--mut); font-size:13.5px; font-weight:800; letter-spacing:.3px;}
+  .chanbig{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:12px auto 0;}
+  .chanbig a{display:flex; align-items:center; gap:11px; padding:11px 20px 11px 12px; border-radius:15px; text-decoration:none; font-weight:800; font-size:15.5px; color:#fff; border:1px solid rgba(255,255,255,.16); transition:.16s;}
+  .chanbig a:hover{transform:translateY(-3px); box-shadow:0 12px 34px rgba(0,0,0,.4);}
+  .chanbig a .ic{width:34px;height:34px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .chanbig a .ic svg{width:24px;height:24px;}
+  .chanbig a .lbl{line-height:1.15; text-align:left;}
+  .chanbig a .lbl small{display:block; font-weight:600; font-size:11px; opacity:.85; margin-top:1px;}
+  .chanbig a.forest{background:linear-gradient(135deg,#00b843,#0a7a3a);}
+  .chanbig a.yt{background:linear-gradient(135deg,#ff2b2b,#c40000);}
+  .chanbig a.chz{background:linear-gradient(135deg,#00ffa3,#00bd7a); color:#052018;}
 
   /* ---------- Start (flavor select) ---------- */
   #start{flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center; padding:20px 0;}
@@ -193,6 +204,9 @@
         <div class="d">성인 전용 · 자극적이고 화끈한<br>심장 쫄깃 밸런스 100문항</div>
       </div>
     </div>
+    <div class="chanlabel">📺 쮸래기 채널 바로가기</div>
+    <div class="chanbig" id="chanBig"></div>
+
     <div class="startfoot">
       각 맛마다 <b>10개 배경 × 10문항 = 100문항</b> · 하루 1~2배경씩 돌리면 일주일 컨텐츠<br>
       🅰🅱 투표로 방청·채팅 표 집계 → 👁 결과 공개로 %를 보여주세요
@@ -534,14 +548,21 @@ const $ = id => document.getElementById(id);
 const DATA = ()=> flavor==='spicy' ? SPICY : MILD;
 
 /* ---- channel links ---- */
-function renderChannels(target, big){
+const ICONS = {
+  yt: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF0000" d="M23.5 7.2a3 3 0 0 0-2.1-2.1C19.5 4.5 12 4.5 12 4.5s-7.5 0-9.4.6A3 3 0 0 0 .5 7.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-4.8Z"/><path fill="#fff" d="M9.6 15.6 15.8 12 9.6 8.4Z"/></svg>`,
+  forest: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="21" height="21" rx="7" fill="#00B843"/><path d="M6.4 16.8c0-5.3 4.3-8.7 11.1-8.7 0 6.5-4.5 9.8-8.7 9.8-1.2 0-2.4-.4-2.4-1.1Z" fill="#fff"/><path d="M8 17.2c2.2-3.5 4.7-5.4 8-6.4" stroke="#00B843" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>`,
+  chz: `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="1.5" y="1.5" width="21" height="21" rx="7" fill="#00FFA3"/><g fill="#08130d"><rect x="6.7" y="9" width="2.5" height="6" rx="1.25"/><rect x="10.75" y="6.3" width="2.5" height="11.4" rx="1.25"/><rect x="14.8" y="10.6" width="2.5" height="2.8" rx="1.25"/></g></svg>`
+};
+function renderChannels(){
   const L = CONFIG.links;
   const items = [
-    {u:L.forest, cls:'forest', em:'🌲', t:'쮸래기 숲'},
-    {u:L.youtube, cls:'yt', em:'▶️', t:'유튜브'},
-    {u:L.chzzk, cls:'chz', em:'🎥', t:'치지직'},
+    {u:L.forest,  cls:'forest', ic:ICONS.forest, t:'쮸래기 숲', s:'SOOP'},
+    {u:L.youtube, cls:'yt',     ic:ICONS.yt,     t:'유튜브',    s:'YouTube'},
+    {u:L.chzzk,   cls:'chz',    ic:ICONS.chz,    t:'치지직',    s:'CHZZK'},
   ];
-  target.innerHTML = items.map(i=>`<a class="${i.cls}" href="${i.u}" target="_blank" rel="noopener" title="${i.t}">${i.em}</a>`).join('');
+  $("chanTop").innerHTML = items.map(i=>`<a class="${i.cls}" href="${i.u}" target="_blank" rel="noopener" title="${i.t}">${i.ic}</a>`).join('');
+  const big = $("chanBig");
+  if(big) big.innerHTML = items.map(i=>`<a class="${i.cls}" href="${i.u}" target="_blank" rel="noopener"><span class="ic">${i.ic}</span><span class="lbl">${i.t}<small>${i.s}</small></span></a>`).join('');
 }
 
 /* ---- navigation ---- */
@@ -670,7 +691,7 @@ document.addEventListener('keydown', e=>{
   else if(k==='r') resetVotes();
 });
 
-renderChannels($("chanTop"));
+renderChannels();
 $("homeCredit").innerHTML=creditHTML();
 $("gameCredit").innerHTML=creditHTML();
 </script>
