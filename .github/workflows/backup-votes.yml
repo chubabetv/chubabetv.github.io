@@ -1,0 +1,25 @@
+name: Backup votes
+on:
+  schedule:
+    - cron: '0 15 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch votes snapshot
+        run: |
+          mkdir -p backups
+          DATE=$(date -u +%Y-%m-%d)
+          curl -s "https://chubabetv-default-rtdb.firebaseio.com/votes.json" -o "backups/votes-$DATE.json"
+          cp "backups/votes-$DATE.json" "backups/votes-latest.json"
+      - name: Commit backup
+        run: |
+          git config user.name "chubabe-backup-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add backups
+          git diff --staged --quiet || git commit -m "votes 백업 $(date -u +%Y-%m-%d)"
+          git push
