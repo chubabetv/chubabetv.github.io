@@ -84,6 +84,9 @@
   .flavor.soon .badge{background:#334155; color:#cbd5e1; letter-spacing:.5px;}
 
   .startfoot{margin-top:26px; color:var(--mut); font-size:12.5px; line-height:1.7;}
+  .adbanner{display:block; max-width:720px; margin:20px auto 0; padding:16px; border-radius:14px; text-decoration:none; text-align:center; border:2px dashed var(--line); color:var(--mut); font-weight:700; font-size:13.5px; transition:.15s;}
+  .adbanner:hover{border-color:rgba(255,255,255,.32); color:var(--txt);}
+  .adbanner b{color:var(--brand);}
   .startfoot b{color:var(--txt);}
 
   /* ---------- Home (theme grid) ---------- */
@@ -219,6 +222,7 @@
       각 맛마다 <b>10개 배경 × 10문항 = 100문항</b> · 하루 1~2배경씩 돌리면 일주일 컨텐츠<br>
       🅰🅱 투표로 방청·채팅 표 집계 → 👁 결과 공개로 %를 보여주세요
     </div>
+    <a class="adbanner" id="adBanner" href="#"></a>
   </div>
 
   <!-- HOME: theme grid -->
@@ -295,6 +299,8 @@
 const CONFIG = {
   channelName: "쮸래기",
   version: "Ver.1",   // ← 문항 버전. Ver.2 만들 때 여기도 올림
+  contactEmail: "sorisri1990@gmail.com",   // 광고 문의 이메일
+  ad: { enabled:true, image:"", link:"", text:"이 자리에 광고를 실어보세요" },  // image 주소 넣으면 배너로 자동 교체
   links: {
     forest : "https://www.sooplive.com/station/2seulli",              // 쮸래기 숲(SOOP)
     youtube: "https://www.youtube.com/@__chubabe",                    // 유튜브
@@ -785,7 +791,8 @@ function share(){
 /* ---- credits ---- */
 function creditHTML(){
   return `<b>쮸래기 밸런스 게임 ${CONFIG.version}</b> · 함께 즐기고 자유롭게 공유하세요 🎲<br>
-    숲 · 유튜브 · 치지직 에서 쮸래기를 만나요`;
+    숲 · 유튜브 · 치지직 에서 쮸래기를 만나요<br>
+    📢 광고 문의 <b>${CONFIG.contactEmail}</b>`;
 }
 
 /* ---- wire ---- */
@@ -803,7 +810,18 @@ document.addEventListener('keydown', e=>{
   else if(e.key==='Escape') goHome();
 });
 
-renderChannels();
+function renderAd(){
+  const a=CONFIG.ad||{}, el=$("adBanner"); if(!el) return;
+  if(a.enabled===false){ el.style.display='none'; return; }
+  if(a.image){
+    el.href=a.link||'#'; el.target='_blank'; el.rel='noopener'; el.style.border='none'; el.style.padding='0';
+    el.innerHTML='<img src="'+a.image+'" alt="광고" style="max-width:100%;border-radius:14px;display:block;margin:0 auto">';
+  } else {
+    el.href='mailto:'+CONFIG.contactEmail+'?subject='+encodeURIComponent('쮸래기 밸런스게임 광고 문의');
+    el.innerHTML='📢 '+(a.text||'광고 자리')+' · <b>광고 문의 '+CONFIG.contactEmail+'</b>';
+  }
+}
+renderChannels(); renderAd();
 { const vt=$("verTag"); if(vt) vt.textContent=CONFIG.version; }
 $("homeCredit").innerHTML=creditHTML();
 $("gameCredit").innerHTML=creditHTML();
