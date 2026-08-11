@@ -141,6 +141,9 @@
   .vbtn.b{background:linear-gradient(135deg,var(--b1),var(--b2));}
   .vbtn:active{transform:scale(.95);}
   .vbtn.done{opacity:.55; cursor:default;}
+  .btn.big{padding:14px 30px; font-size:16px; font-weight:900; border-radius:15px;}
+  .btn.big.ready{background:linear-gradient(135deg,var(--a1),var(--b1)); border:none; color:#fff; box-shadow:0 8px 26px rgba(255,77,109,.4);}
+  .btn.big.done{opacity:.75; cursor:default;}
   .cnt{font-size:12.5px; color:var(--mut); min-width:64px; text-align:center;}
   .hint{text-align:center; color:var(--mut); font-size:12px; margin-top:12px; opacity:.7;}
   kbd{background:var(--ink2); border:1px solid var(--line); border-radius:6px; padding:1px 7px; font-size:11px; font-weight:700;}
@@ -251,9 +254,7 @@
     <div class="votebar" id="voteBar"><div class="va" id="barA"></div><div class="vb" id="barB"></div></div>
 
     <div class="controls">
-      <button class="vbtn a" id="voteA" onclick="vote('a')">🅰 투표</button>
-      <button class="btn" id="btnReveal">👁 결과 보기</button>
-      <button class="vbtn b" id="voteB" onclick="vote('b')">🅱 투표</button>
+      <button class="btn big" id="btnReveal">👆 먼저 A · B 선택</button>
     </div>
     <div class="cnt" id="totalVotes" style="margin-top:8px;height:16px"></div>
     <div class="controls" style="margin-top:10px">
@@ -668,6 +669,7 @@ function render(){
   $("progBar").style.width=((idx+1)/tot*100)+"%";
   $("arena").classList.remove("revealed");
   $("sideA").classList.remove("sel"); $("sideB").classList.remove("sel");
+  pending=null;
   bindQuestion(c.ti, c.qi);
 }
 
@@ -698,33 +700,42 @@ function showResult(v){
 function bindQuestion(ti,qi){
   if(FB && curRef){ curRef.off(); curRef=null; }
   const voted=myVote(ti,qi);
-  $("voteA").classList.toggle('done', voted==='a');
-  $("voteB").classList.toggle('done', voted==='b');
-  $("voteA").innerHTML = voted==='a' ? '🅰 선택함 ✓' : '🅰 투표';
-  $("voteB").innerHTML = voted==='b' ? '🅱 선택함 ✓' : '🅱 투표';
   if(voted){
+    $("btnReveal").className='btn big done';
+    $("btnReveal").innerHTML='✓ 투표 완료 · 실시간 결과';
     if(FB){
       curRef=FB.child(vkey(ti,qi));
       curRef.on('value', s=>{ const cur=current(); if(cur.ti===ti&&cur.qi===qi) showResult(s.val()||{a:0,b:0}); });
     } else { showResult(localAgg[vkey(ti,qi)]||{a:0,b:0}); }
   } else {
+    $("btnReveal").className='btn big';
+    $("btnReveal").innerHTML='👆 먼저 A · B 선택';
     $("arena").classList.remove("revealed");
     $("sideA").classList.remove("sel"); $("sideB").classList.remove("sel");
     updateBar({a:0,b:0}); $("totalVotes").textContent="";
   }
 }
-function vote(side){
-  const c=current(), ti=c.ti, qi=c.qi;
-  if(myVote(ti,qi)) return;                        // 기기당 1회
-  setMyVote(ti,qi,side);
-  if(FB){ FB.child(vkey(ti,qi)).child(side).transaction(n=>(n||0)+1); }
-  else { const k=vkey(ti,qi); if(!localAgg[k]) localAgg[k]={a:0,b:0}; localAgg[k][side]++; }
-  bindQuestion(ti,qi);                             // 결과 표시로 전환(실시간 연결)
+let pending=null;   // 확정 전 임시 선택(A/B 자유 변경 가능)
+function markPending(side){
+  pending=side;
+  $("sideA").classList.toggle('sel', side==='a');
+  $("sideB").classList.toggle('sel', side==='b');
+  $("btnReveal").className='btn big ready';
+  $("btnReveal").innerHTML='🗳️ 투표하고 결과 보기';
 }
-function reveal(){
+function vote(side){                 // = 선택만 (확정 아님, 다시 눌러 변경 가능)
   const c=current();
-  if(!myVote(c.ti,c.qi)){ toast('투표 후 확인 가능해요 -♥'); return; }
-  bindQuestion(c.ti,c.qi);
+  if(myVote(c.ti,c.qi)) return;      // 이미 확정된 문항 → 변경 불가
+  markPending(side);
+}
+function reveal(){                   // = 확정 + 결과 공개
+  const c=current(), ti=c.ti, qi=c.qi;
+  if(myVote(ti,qi)){ bindQuestion(ti,qi); return; }        // 이미 확정 → 결과만
+  if(!pending){ toast('먼저 A 또는 B를 선택해주세요 ♥'); return; }
+  setMyVote(ti,qi,pending);          // ← 여기서 확정(이후 수정 불가)
+  if(FB){ FB.child(vkey(ti,qi)).child(pending).transaction(n=>(n||0)+1); }
+  else { const k=vkey(ti,qi); if(!localAgg[k]) localAgg[k]={a:0,b:0}; localAgg[k][pending]++; }
+  bindQuestion(ti,qi);               // 결과 표시(+실시간)
 }
 function next(){ if(idx<total()-1){ idx++; render(); } }
 function prev(){ if(idx>0){ idx--; render(); } }
