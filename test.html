@@ -300,7 +300,7 @@ const CONFIG = {
   channelName: "쮸래기",
   version: "Ver.1",   // ← 문항 버전. Ver.2 만들 때 여기도 올림
   contactEmail: "sorisri1990@gmail.com",   // 광고 문의 이메일
-  ad: { enabled:true, image:"", link:"", text:"이 자리에 광고를 실어보세요" },  // image 주소 넣으면 배너로 자동 교체
+  ad: { enabled:false, image:"", link:"", text:"이 자리에 광고를 실어보세요" },  // enabled:true 로 바꾸면 배너 표시. image 주소 넣으면 실제 광고로 교체
   links: {
     forest : "https://www.sooplive.com/station/2seulli",              // 쮸래기 숲(SOOP)
     youtube: "https://www.youtube.com/@__chubabe",                    // 유튜브
@@ -791,8 +791,7 @@ function share(){
 /* ---- credits ---- */
 function creditHTML(){
   return `<b>쮸래기 밸런스 게임 ${CONFIG.version}</b> · 함께 즐기고 자유롭게 공유하세요 🎲<br>
-    숲 · 유튜브 · 치지직 에서 쮸래기를 만나요<br>
-    📢 광고 문의 <b>${CONFIG.contactEmail}</b>`;
+    숲 · 유튜브 · 치지직 에서 쮸래기를 만나요`;
 }
 
 /* ---- wire ---- */
