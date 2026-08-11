@@ -186,6 +186,7 @@
     <div class="brand" onclick="goStart()"><span class="logo">🎲</span> 쮸래기 밸런스 게임</div>
     <div class="sp"></div>
     <div class="chan" id="chanTop"></div>
+    <span class="chip" id="onlineChip" style="display:none; margin-right:4px;">🟢 <b id="onlineCount" style="margin:0 3px">0</b>명 접속</span>
     <button class="btn ghost sm" id="btnShare">🔗 공유</button>
     <button class="btn ghost sm" id="btnFull">⛶</button>
   </div>
@@ -255,6 +256,7 @@
 
     <div class="controls">
       <button class="btn big" id="btnReveal">👆 먼저 A · B 선택</button>
+      <button class="btn ghost sm" id="btnRevote" style="display:none" onclick="startRevote()">🔄 다시 선택</button>
     </div>
     <div class="cnt" id="totalVotes" style="margin-top:8px;height:16px"></div>
     <div class="controls" style="margin-top:10px">
@@ -669,15 +671,22 @@ function render(){
   $("progBar").style.width=((idx+1)/tot*100)+"%";
   $("arena").classList.remove("revealed");
   $("sideA").classList.remove("sel"); $("sideB").classList.remove("sel");
-  pending=null;
+  pending=null; editing=false;
   bindQuestion(c.ti, c.qi);
 }
 
 /* ===== 투표: Firebase 실시간 집계 + 기기당 1회 + 결과 잠금 ===== */
 let FB=null, curRef=null;
 try{
-  if(typeof firebase!=='undefined'){ firebase.initializeApp(FIREBASE_CONFIG); FB=firebase.database().ref('votes'); }
+  if(typeof firebase!=='undefined'){ firebase.initializeApp(FIREBASE_CONFIG); FB=firebase.database().ref('votes'); initPresence(); }
 }catch(e){ FB=null; }
+function initPresence(){   // 실시간 접속 인원
+  try{
+    const db=firebase.database(), presRef=db.ref('presence'), conRef=db.ref('.info/connected');
+    conRef.on('value', s=>{ if(s.val()===true){ const me=presRef.push(); me.onDisconnect().remove(); me.set(true); } });
+    presRef.on('value', s=>{ const n=s.numChildren(); const chip=$("onlineChip"); if(chip) chip.style.display='inline-flex'; const cnt=$("onlineCount"); if(cnt) cnt.textContent=n; });
+  }catch(e){}
+}
 const localAgg={};   // 백엔드 불가(오프라인 등) 시 폴백
 function vkey(ti,qi){ return CONFIG.version.replace(/[.#$\[\]\/]/g,'_')+'_'+flavor+'_'+ti+'_'+qi; }
 function lskey(ti,qi){ return 'cbv_'+CONFIG.version+'_'+flavor+'_'+ti+'_'+qi; }
@@ -701,6 +710,8 @@ function bindQuestion(ti,qi){
   if(FB && curRef){ curRef.off(); curRef=null; }
   const voted=myVote(ti,qi);
   if(voted){
+    editing=false;
+    $("btnRevote").style.display='';
     $("btnReveal").className='btn big done';
     $("btnReveal").innerHTML='✓ 투표 완료 · 실시간 결과';
     if(FB){
@@ -708,6 +719,7 @@ function bindQuestion(ti,qi){
       curRef.on('value', s=>{ const cur=current(); if(cur.ti===ti&&cur.qi===qi) showResult(s.val()||{a:0,b:0}); });
     } else { showResult(localAgg[vkey(ti,qi)]||{a:0,b:0}); }
   } else {
+    $("btnRevote").style.display='none';
     $("btnReveal").className='btn big';
     $("btnReveal").innerHTML='👆 먼저 A · B 선택';
     $("arena").classList.remove("revealed");
@@ -716,6 +728,18 @@ function bindQuestion(ti,qi){
   }
 }
 let pending=null;   // 확정 전 임시 선택(A/B 자유 변경 가능)
+let editing=false;  // '다시 선택' 편집 모드
+function startRevote(){
+  const c=current(), old=myVote(c.ti,c.qi);
+  if(!old) return;
+  editing=true;
+  if(FB && curRef){ curRef.off(); curRef=null; }
+  $("arena").classList.remove('revealed');
+  $("totalVotes").textContent='';
+  $("btnRevote").style.display='none';
+  markPending(old);                       // 현재 선택을 미리 표시
+  $("btnReveal").innerHTML='🗳️ 바꿔서 투표하기';
+}
 function markPending(side){
   pending=side;
   $("sideA").classList.toggle('sel', side==='a');
@@ -725,16 +749,25 @@ function markPending(side){
 }
 function vote(side){                 // = 선택만 (확정 아님, 다시 눌러 변경 가능)
   const c=current();
-  if(myVote(c.ti,c.qi)) return;      // 이미 확정된 문항 → 변경 불가
+  if(myVote(c.ti,c.qi) && !editing) return;   // 확정됨 & 편집 아님 → 무시
   markPending(side);
 }
-function reveal(){                   // = 확정 + 결과 공개
-  const c=current(), ti=c.ti, qi=c.qi;
-  if(myVote(ti,qi)){ bindQuestion(ti,qi); return; }        // 이미 확정 → 결과만
+function reveal(){                   // = 확정(또는 바꿔서 확정) + 결과 공개
+  const c=current(), ti=c.ti, qi=c.qi, k=vkey(ti,qi);
+  const old=myVote(ti,qi);
+  if(old && !editing){ bindQuestion(ti,qi); return; }      // 이미 확정 → 결과만
   if(!pending){ toast('먼저 A 또는 B를 선택해주세요 ♥'); return; }
-  setMyVote(ti,qi,pending);          // ← 여기서 확정(이후 수정 불가)
-  if(FB){ FB.child(vkey(ti,qi)).child(pending).transaction(n=>(n||0)+1); }
-  else { const k=vkey(ti,qi); if(!localAgg[k]) localAgg[k]={a:0,b:0}; localAgg[k][pending]++; }
+  if(editing && old){                                       // 투표 바꾸기(집계 조정)
+    if(pending!==old){
+      if(FB){ FB.child(k).child(old).transaction(n=>Math.max(0,(n||0)-1)); FB.child(k).child(pending).transaction(n=>(n||0)+1); }
+      else { if(!localAgg[k]) localAgg[k]={a:0,b:0}; localAgg[k][old]=Math.max(0,(localAgg[k][old]||0)-1); localAgg[k][pending]=(localAgg[k][pending]||0)+1; }
+    }
+  } else {                                                  // 최초 확정
+    if(FB){ FB.child(k).child(pending).transaction(n=>(n||0)+1); }
+    else { if(!localAgg[k]) localAgg[k]={a:0,b:0}; localAgg[k][pending]++; }
+  }
+  setMyVote(ti,qi,pending);
+  editing=false;
   bindQuestion(ti,qi);               // 결과 표시(+실시간)
 }
 function next(){ if(idx<total()-1){ idx++; render(); } }
