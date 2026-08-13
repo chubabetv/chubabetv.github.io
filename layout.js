@@ -79,9 +79,19 @@
   function presence(){
     try{
       if(!CHUBABE.db) return;
-      const db=CHUBABE.db, presRef=db.ref('presence'), conRef=db.ref('.info/connected');
-      conRef.on('value', function(s){ if(s.val()===true){ const me=presRef.push(); me.onDisconnect().remove(); me.set(true); } });
-      presRef.on('value', function(s){ const el=document.getElementById('cbhOnlineN'), box=document.getElementById('cbhOnline'); if(el) el.textContent=s.numChildren(); if(box) box.style.display='inline-flex'; });
+      var db=CHUBABE.db, presRef=db.ref('presence'), conRef=db.ref('.info/connected');
+      var myRef=null;
+      function beat(){ if(myRef) myRef.set(Date.now()); }   // lastSeen 갱신
+      conRef.on('value', function(s){
+        if(s.val()===true){ myRef=presRef.push(); myRef.onDisconnect().remove(); beat(); }
+      });
+      setInterval(beat, 15000);   // 15초마다 살아있음 신호
+      presRef.on('value', function(s){
+        var now=Date.now(), n=0;
+        s.forEach(function(ch){ var t=ch.val(); if(typeof t==='number' && (now-t)<60000) n++; });  // 60초 내 활동만 집계
+        var el=document.getElementById('cbhOnlineN'), box=document.getElementById('cbhOnline');
+        if(el) el.textContent=n; if(box) box.style.display='inline-flex';
+      });
     }catch(e){}
   }
   function render(){
