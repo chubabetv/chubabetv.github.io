@@ -8,26 +8,14 @@
 <meta property="og:description" content="쮸래기랑 함께 노는 미니게임 모음 — 밸런스 게임 · 라이어 게임">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  :root{
-    --bg:#12101c; --card:#1e1b2e; --card2:#272341;
-    --a1:#ff4d8d; --b1:#7b5cff; --text:#f4f2ff; --muted:#9c98b5; --good:#33d69f; --line:#332f4a;
-  }
+  :root{ --bg:#12101c; --card:#1e1b2e; --card2:#272341; --a1:#ff4d8d; --b1:#7b5cff; --text:#f4f2ff; --muted:#9c98b5; --good:#33d69f; --line:#332f4a; }
   html,body{height:100%;}
-  body{
-    font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  body{ font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
     background:radial-gradient(120% 80% at 50% -10%,#2a2140 0%,var(--bg) 55%);
-    color:var(--text); min-height:100dvh; padding:16px;
-    display:flex; flex-direction:column;
-  }
-  .top{ max-width:480px; width:100%; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:6px 2px 0; }
-  .brand{ font-weight:900; font-size:20px; letter-spacing:-.5px; display:flex; align-items:center; gap:9px; }
-  .brand .logo{ width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--a1),var(--b1));
-    display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 16px rgba(255,77,141,.4); }
-  .online{ font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px; }
-  .online b{ color:var(--good); }
+    color:var(--text); min-height:100dvh; padding:16px; }
+  .wrap{ max-width:480px; width:100%; margin:0 auto; }
 
-  .wrap{ max-width:480px; width:100%; margin:auto; }
-  .hero{ text-align:center; margin:26px 0 24px; }
+  .hero{ text-align:center; margin:22px 0 24px; }
   .hero .tag{ display:inline-block; font-size:12px; color:var(--muted); background:var(--card);
     border:1px solid var(--line); padding:6px 13px; border-radius:20px; margin-bottom:16px; }
   .hero h1{ font-size:38px; font-weight:900; letter-spacing:-1.5px; line-height:1.15;
@@ -50,30 +38,20 @@
   .game .txt .badge{ display:inline-block; font-size:11px; font-weight:800; color:var(--good);
     background:rgba(51,214,159,.12); padding:2px 8px; border-radius:8px; margin-top:7px; }
 
-  .channels{ margin-top:30px; text-align:center; }
-  .channels .lbl{ font-size:12px; color:var(--muted); margin-bottom:12px; }
-  .chan-row{ display:flex; gap:10px; justify-content:center; }
-  .chan{ flex:1; max-width:130px; text-decoration:none; color:var(--text); background:var(--card2);
-    border:1px solid var(--line); border-radius:14px; padding:12px 8px; font-size:13px; font-weight:700; transition:.15s; }
-  .chan:active{ transform:scale(.96); }
-  .chan:hover{ border-color:var(--a1); }
-  .chan .e{ display:block; font-size:20px; margin-bottom:4px; }
-  .foot{ text-align:center; color:var(--muted); font-size:11px; margin-top:26px; padding-bottom:10px; }
+  .foot-note{ text-align:center; color:var(--muted); font-size:11px; margin-top:8px; }
 </style>
 </head>
 <body>
-  <div class="top">
-    <div class="brand"><span class="logo">🎪</span> 쮸래기 놀이터</div>
-    <div class="online">🟢 접속 <b id="online-n">–</b>명</div>
-  </div>
-
   <div class="wrap">
+    <!-- 공통 헤더 (layout.js) -->
+    <header id="site-header"></header>
+
+    <!-- 가운데: 이 페이지 고유 내용 -->
     <div class="hero">
       <div class="tag">🎬 쮸래기 공식 놀이터</div>
       <h1>함께 노는<br>미니게임 모음</h1>
       <p>하고 싶은 게임을 골라보세요</p>
     </div>
-
     <div class="games">
       <a class="game balance" href="balance.html">
         <div class="ico">🎲</div>
@@ -93,33 +71,13 @@
       </a>
     </div>
 
-    <div class="channels">
-      <div class="lbl">📺 쮸래기 채널 바로가기</div>
-      <div class="chan-row">
-        <a class="chan" href="https://www.sooplive.com/station/2seulli" target="_blank" rel="noopener"><span class="e">🌳</span>숲(SOOP)</a>
-        <a class="chan" href="https://www.youtube.com/@__chubabe" target="_blank" rel="noopener"><span class="e">▶️</span>유튜브</a>
-        <a class="chan" href="https://chzzk.naver.com/f5d624520cd161920141bc8d661ba214" target="_blank" rel="noopener"><span class="e">🟢</span>치지직</a>
-      </div>
-    </div>
-
-    <div class="foot">쮸래기 놀이터 · 함께 즐기고 자유롭게 공유하세요 🎪</div>
+    <!-- 공통 푸터 (layout.js) -->
+    <footer id="site-footer"></footer>
+    <div class="foot-note">쮸래기 놀이터 · 함께 즐기고 자유롭게 공유하세요 🎪</div>
   </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script>
-const FIREBASE_CONFIG = {
-  apiKey:"AIzaSyD2odCX0V1dthMjilXcWOKOe4o8p1xuGYI", authDomain:"chubabetv.firebaseapp.com",
-  databaseURL:"https://chubabetv-default-rtdb.firebaseio.com", projectId:"chubabetv",
-  storageBucket:"chubabetv.firebasestorage.app", messagingSenderId:"889265807362",
-  appId:"1:889265807362:web:c5cc2b27437b8e590bc71b"
-};
-try{
-  firebase.initializeApp(FIREBASE_CONFIG);
-  const db=firebase.database(), presRef=db.ref('presence'), conRef=db.ref('.info/connected');
-  conRef.on('value', s=>{ if(s.val()===true){ const me=presRef.push(); me.onDisconnect().remove(); me.set(true); } });
-  presRef.on('value', s=>{ document.getElementById('online-n').textContent=s.numChildren(); });
-}catch(e){ document.getElementById('online-n').textContent='?'; }
-</script>
+<script src="layout.js"></script>
 </body>
 </html>

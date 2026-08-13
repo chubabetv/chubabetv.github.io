@@ -142,14 +142,13 @@
 </head>
 <body>
 <div class="app">
-  <div class="playtop"><a href="index.html"><span class="plogo">🎪</span> ‹ 쮸래기 놀이터</a></div>
+  <header id="site-header"></header>
 
   <!-- ===== 홈 ===== -->
   <div class="screen active" id="s-home">
     <div class="logo">
       <h1>라이어게임</h1>
       <p>실시간 시참 · 각자 폰으로 접속</p>
-      <div class="status-dot mt">🟢 지금 접속 <b id="online-n" style="color:var(--good);margin:0 3px">–</b>명</div>
     </div>
     <div class="card">
       <div class="label">👑 방장 (쮸래기)</div>
@@ -273,23 +272,15 @@
     <button class="btn ghost small mt" onclick="leaveRoom()">방 나가기</button>
   </div>
 
+  <footer id="site-footer"></footer>
 </div>
 <div class="toast" id="toast"></div>
 
 <!-- Firebase (밸런스게임과 동일한 실시간 DB 재사용) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="layout.js"></script>
 <script>
-/* ===== Firebase 설정 (chubabetv — 밸런스게임과 동일) ===== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyD2odCX0V1dthMjilXcWOKOe4o8p1xuGYI",
-  authDomain: "chubabetv.firebaseapp.com",
-  databaseURL: "https://chubabetv-default-rtdb.firebaseio.com",
-  projectId: "chubabetv",
-  storageBucket: "chubabetv.firebasestorage.app",
-  messagingSenderId: "889265807362",
-  appId: "1:889265807362:web:c5cc2b27437b8e590bc71b"
-};
 
 /* ===== 제시어 데이터 ===== */
 const WORDS = {
@@ -316,17 +307,9 @@ function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
 function avatar(name){ return (name||'?').trim().charAt(0).toUpperCase()||'?'; }
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-/* ===== Firebase 연결 ===== */
-try{ firebase.initializeApp(FIREBASE_CONFIG); db=firebase.database(); initOnline(); }
+/* ===== Firebase 연결 (layout.js가 초기화 → 공용 db 사용) ===== */
+try{ db=(window.CHUBABE&&window.CHUBABE.db)?window.CHUBABE.db:firebase.database(); }
 catch(e){ toast("실시간 서버 연결 실패 (인터넷 확인)"); }
-
-function initOnline(){
-  try{
-    const presRef=db.ref('presence'), conRef=db.ref('.info/connected');
-    conRef.on('value', s=>{ if(s.val()===true){ const me=presRef.push(); me.onDisconnect().remove(); me.set(true); } });
-    presRef.on('value', s=>{ $("online-n").textContent=s.numChildren(); });
-  }catch(e){}
-}
 
 /* ===== 카테고리 칩(방장) ===== */
 function buildCats(){
