@@ -177,7 +177,8 @@
       <div class="label">👥 참가자 <span id="host-count" style="color:var(--text)">0</span>명</div>
       <div class="plist" id="host-players"></div>
     </div>
-    <button class="btn" id="start-btn" onclick="startGame()">게임 시작 🎬</button>
+    <button class="btn ghost small" onclick="addBot()">🤖 테스트 참가자 추가 (혼자 연습용)</button>
+    <button class="btn mt" id="start-btn" onclick="startGame()">게임 시작 🎬</button>
     <p class="muted-c mt">최소 3명(방장 포함)부터 시작할 수 있어요.</p>
     <button class="btn ghost small mt" onclick="leaveRoom()">방 닫고 나가기</button>
   </div>
@@ -391,6 +392,17 @@ function renderPlayers(players){
   if(isHost) mk($("host-players"),$("host-count"));
   mk($("lobby-players"),$("lobby-count"));
   if(isHost) $("start-btn").disabled = ids.length<3;
+}
+
+/* ===== 테스트용 가짜 참가자 ===== */
+function addBot(){
+  if(!isHost||!roomRef){ return toast("방장만 추가할 수 있어요"); }
+  const players=(room&&room.players)||{};
+  const bots=Object.values(players).filter(p=>p.bot).length;
+  const names=["연습이","테스트리","봇둘리","가짜맨","더미"];
+  const nm=(names[bots]||("테스트"+(bots+1)))+" 🤖";
+  roomRef.child('players').push({ name:nm, bot:true });
+  toast(nm+" 참가!");
 }
 
 /* ===== 게임 시작 (방장) ===== */
