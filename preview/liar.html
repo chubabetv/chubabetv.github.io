@@ -12,32 +12,28 @@
     --good:#33d69f; --line:#332f4a; --warn:#ffb03a;
   }
   html,body{height:100%;}
-  body{
-    font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  body{ font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
     background:radial-gradient(120% 80% at 50% -10%,#2a2140 0%,var(--bg) 55%);
-    color:var(--text); min-height:100dvh;
-    display:flex; align-items:flex-start; justify-content:center;
-    padding:16px; overflow-x:hidden;
-  }
+    color:var(--text); min-height:100dvh; display:flex; align-items:flex-start; justify-content:center;
+    padding:16px; overflow-x:hidden; }
   .app{ width:100%; max-width:460px; margin:auto; }
   .screen{ display:none; animation:fade .3s ease; }
   .screen.active{ display:block; }
   @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
 
-  .playtop{ margin-bottom:8px; }
-  .playtop a{ display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--muted); font-weight:800; font-size:15px; transition:.15s; }
-  .playtop a:hover{ color:var(--text); }
-  .playtop .plogo{ width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:14px; }
-
   .logo{ text-align:center; margin:10px 0 20px; }
   .logo h1{ font-size:30px; font-weight:900; letter-spacing:-1px;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    -webkit-background-clip:text; background-clip:text; color:transparent; }
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .logo p{ color:var(--muted); font-size:13px; margin-top:6px; }
   .status-dot{ display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--muted); }
 
   .card{ background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px; margin-bottom:14px; }
-  .label{ font-size:13px; color:var(--muted); margin-bottom:10px; font-weight:700; }
+  .label{ font-size:13px; color:var(--muted); margin-bottom:10px; font-weight:700; display:flex; align-items:center; gap:6px; }
+
+  .ico-i{ width:18px; height:18px; border-radius:50%; border:1px solid var(--muted); background:transparent;
+    color:var(--muted); font-size:11px; font-weight:900; line-height:1; cursor:pointer; flex-shrink:0;
+    display:inline-flex; align-items:center; justify-content:center; font-style:normal; }
+  .ico-i:active{ transform:scale(.9); background:var(--accent2); color:#fff; border-color:var(--accent2); }
 
   .btn{ width:100%; padding:17px; border-radius:16px; border:none; font-size:17px; font-weight:900;
     background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff; cursor:pointer;
@@ -65,16 +61,22 @@
     color:var(--text); font-size:14px; font-weight:700; cursor:pointer; transition:.15s; }
   .chip.on{ background:linear-gradient(90deg,var(--accent),var(--accent2)); }
 
+  .modeopt{ display:flex; align-items:center; gap:10px; background:var(--card2); border:1px solid transparent;
+    border-radius:14px; padding:13px 15px; cursor:pointer; margin-bottom:8px; transition:.15s; }
+  .modeopt.on{ border-color:var(--accent); background:linear-gradient(150deg,#2a1140,var(--card2)); }
+  .modeopt .mo-name{ font-weight:800; font-size:15px; }
+  .modeopt .mo-sub{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .modeopt .sp{ flex:1; }
+
   .toggle{ display:flex; align-items:center; justify-content:space-between; }
-  .switch{ width:54px; height:31px; border-radius:20px; background:var(--card2); position:relative; cursor:pointer; transition:.2s; border:none; }
+  .switch{ width:54px; height:31px; border-radius:20px; background:var(--card2); position:relative; cursor:pointer; transition:.2s; border:none; flex-shrink:0; }
   .switch.on{ background:var(--good); }
   .switch::after{ content:''; position:absolute; width:25px; height:25px; border-radius:50%; background:#fff; top:3px; left:3px; transition:.2s; }
   .switch.on::after{ left:26px; }
 
   .codebig{ text-align:center; }
   .codebig .cc{ font-size:56px; font-weight:900; letter-spacing:12px; padding-left:12px;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    -webkit-background-clip:text; background-clip:text; color:transparent; }
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
   .plist{ display:flex; flex-direction:column; gap:9px; }
   .pill{ display:flex; align-items:center; gap:10px; background:var(--card2); border-radius:14px; padding:12px 14px; font-weight:700; }
@@ -82,7 +84,6 @@
     display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; flex-shrink:0; }
   .pill .tag{ margin-left:auto; font-size:12px; color:var(--muted); font-weight:800; }
   .pill.me{ border:1px solid var(--accent2); }
-  .pill.turn{ border:1px solid var(--accent); background:linear-gradient(150deg,#2a1140,var(--card2)); }
 
   .cardface{ min-height:220px; border-radius:24px; display:flex; flex-direction:column; align-items:center;
     justify-content:center; cursor:pointer; user-select:none; border:1px solid var(--line);
@@ -93,6 +94,8 @@
   .cardface .tap b{ color:var(--text); }
   .cardface.liar{ background:linear-gradient(150deg,#3a1226,#2a1140); border-color:var(--accent); }
   .cardface.liar .word{ color:var(--accent); }
+  .cardface.spy{ background:linear-gradient(150deg,#122a3a,#141f40); border-color:#4dc3ff; }
+  .cardface.spy .word{ color:#4dc3ff; }
   .cardface .sub{ font-size:14px; color:var(--muted); margin-top:12px; line-height:1.5; }
 
   .order{ display:flex; flex-wrap:wrap; gap:7px; }
@@ -101,13 +104,13 @@
   .obadge.now{ background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff; }
   .obadge.done{ opacity:.5; }
 
-  /* 턴 배너 */
   .turnb{ text-align:center; }
   .turnb .big{ font-size:22px; font-weight:900; }
   .turnb .big.mine{ color:var(--accent); }
   .turnb .rnd{ display:inline-block; margin-top:6px; font-size:12px; color:var(--muted); background:var(--card2); padding:3px 10px; border-radius:10px; }
+  .turnb .clock{ display:inline-block; margin-left:6px; font-weight:900; color:var(--warn); font-variant-numeric:tabular-nums; }
+  .turnb .clock.danger{ color:var(--accent); }
 
-  /* 설명 기록 피드 */
   .cluefeed{ display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto; }
   .clueitem{ display:flex; gap:10px; align-items:flex-start; }
   .clueitem.mine{ flex-direction:row-reverse; }
@@ -127,24 +130,35 @@
   .vote-btn .cnt{ margin-left:auto; background:var(--bg); border-radius:10px; padding:3px 10px; font-size:13px; color:var(--accent); min-width:34px; text-align:center; }
 
   .answer-word{ font-size:42px; font-weight:900; text-align:center; margin:6px 0 4px;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    -webkit-background-clip:text; background-clip:text; color:transparent; }
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .result-box{ text-align:center; padding:22px; border-radius:20px; margin-bottom:14px; }
+  .result-box.citizen{ background:linear-gradient(150deg,#123a2a,#141f40); border:1px solid var(--good); }
+  .result-box.liar{ background:linear-gradient(150deg,#3a1226,#2a1140); border:1px solid var(--accent); }
+  .result-box .rw{ font-size:26px; font-weight:900; }
+  .result-box .rd{ font-size:13px; color:var(--muted); margin-top:8px; line-height:1.5; }
+  .rolerow{ display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; padding:8px 0; border-bottom:1px solid var(--line); }
+  .rolerow:last-child{ border-bottom:none; }
+  .rolerow .rtag{ margin-left:auto; font-size:12px; padding:3px 9px; border-radius:9px; font-weight:900; }
   .liar-list{ text-align:center; font-size:22px; font-weight:900; color:var(--accent); margin-top:6px; }
   .muted-c{ text-align:center; color:var(--muted); font-size:13px; }
 
   .toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(80px);
     background:#000; color:#fff; padding:12px 20px; border-radius:14px; font-weight:700; font-size:14px;
-    opacity:0; transition:.25s; z-index:99; pointer-events:none; }
+    opacity:0; transition:.25s; z-index:99; pointer-events:none; max-width:90%; text-align:center; }
   .toast.show{ transform:translateX(-50%) translateY(0); opacity:.95; }
+
   .modal{ position:fixed; inset:0; background:rgba(8,6,16,.82); display:none; align-items:center; justify-content:center; z-index:120; padding:24px; }
   .modal.on{ display:flex; }
-  .modal-box{ background:var(--card2); border:1px solid var(--line); border-radius:22px; padding:28px 24px; text-align:center; max-width:340px; width:100%; }
+  .modal-box{ background:var(--card2); border:1px solid var(--line); border-radius:22px; padding:26px 22px; text-align:center; max-width:360px; width:100%; max-height:80vh; overflow-y:auto; }
   .modal-box.liarbox{ background:linear-gradient(150deg,#3a1226,#2a1140); border-color:var(--accent); }
+  .modal-box.spybox{ background:linear-gradient(150deg,#122a3a,#141f40); border-color:#4dc3ff; }
   .modal-box .pk-top{ font-size:14px; color:var(--muted); margin-bottom:12px; }
-  .modal-box .pk-word{ font-size:36px; font-weight:900; }
-  .modal-box .pk-sub{ font-size:13px; color:var(--muted); margin-top:10px; }
-  .turnb .clock{ display:inline-block; margin-left:6px; font-weight:900; color:var(--warn); font-variant-numeric:tabular-nums; }
-  .turnb .clock.danger{ color:var(--accent); }
+  .modal-box .pk-word{ font-size:34px; font-weight:900; }
+  .modal-box .pk-sub{ font-size:13px; color:var(--muted); margin-top:10px; line-height:1.5; }
+  .info-t{ font-size:18px; font-weight:900; margin-bottom:12px; }
+  .info-b{ font-size:14px; color:var(--text); line-height:1.65; text-align:left; }
+  .info-b b{ color:var(--accent); }
+
   .hostonly{ display:none; }
   body.is-host .hostonly{ display:block; }
 </style>
@@ -155,10 +169,7 @@
 
   <!-- ===== 홈 ===== -->
   <div class="screen active" id="s-home">
-    <div class="logo">
-      <h1>라이어게임</h1>
-      <p>실시간 시참 · 각자 폰으로 접속</p>
-    </div>
+    <div class="logo"><h1>라이어게임</h1><p>실시간 시참 · 각자 폰으로 접속</p></div>
     <div class="card">
       <div class="label">👑 방장 (쮸래기)</div>
       <button class="btn" onclick="createRoom()">방 만들기</button>
@@ -176,37 +187,59 @@
   <div class="screen" id="s-host">
     <div class="logo"><h1 style="font-size:24px">방장 대기실</h1></div>
     <div class="card codebig">
-      <div class="label" style="text-align:center">방 코드 (방송에 띄우세요)</div>
+      <div class="label" style="justify-content:center">방 코드 (방송에 띄우세요)</div>
       <div class="cc" id="host-code">----</div>
       <button class="btn ghost small mt" onclick="copyCode()">📋 참가 링크 복사</button>
     </div>
+
     <div class="card">
-      <div class="label">📂 주제</div>
-      <div class="chips" id="host-cats"></div>
+      <div class="label">🎮 게임 모드 <button class="ico-i" onclick="showHelp('modes')">i</button></div>
+      <div class="modeopt on" data-m="classic" onclick="pickMode('classic')">
+        <div><div class="mo-name">🎭 클래식</div><div class="mo-sub">라이어는 제시어를 모른다</div></div>
+        <div class="sp"></div>
+        <button class="ico-i" onclick="event.stopPropagation();showHelp('mode_classic')">i</button>
+      </div>
+      <div class="modeopt" data-m="spy" onclick="pickMode('spy')">
+        <div><div class="mo-name">🕵️ 스파이</div><div class="mo-sub">정답 아는 스파이가 라이어를 감싼다</div></div>
+        <div class="sp"></div>
+        <button class="ico-i" onclick="event.stopPropagation();showHelp('mode_spy')">i</button>
+      </div>
+      <div class="modeopt" data-m="babo" onclick="pickMode('babo')">
+        <div><div class="mo-name">🤪 바보</div><div class="mo-sub">자기가 라이어인 줄 모른다</div></div>
+        <div class="sp"></div>
+        <button class="ico-i" onclick="event.stopPropagation();showHelp('mode_babo')">i</button>
+      </div>
     </div>
+
     <div class="card">
-      <div class="label">🕵️ 라이어 수</div>
+      <div class="label" id="liar-label">🕵️ 라이어 수 <button class="ico-i" onclick="showHelp('liars')">i</button></div>
       <div class="stepper">
         <button class="rbtn" onclick="chgLiars(-1)">−</button>
         <div class="val" id="v-liars">1</div>
         <button class="rbtn" onclick="chgLiars(1)">＋</button>
       </div>
       <div class="toggle" style="margin-top:18px">
-        <div class="label" style="margin:0">💡 라이어에게 주제 힌트</div>
+        <div class="label" style="margin:0">💡 라이어에게 주제 힌트 <button class="ico-i" onclick="showHelp('hint')">i</button></div>
         <button class="switch on" id="sw-hint" onclick="this.classList.toggle('on')"></button>
       </div>
+      <div class="toggle" style="margin-top:16px">
+        <div class="label" style="margin:0">🔁 반전 찬스 <button class="ico-i" onclick="showHelp('reversal')">i</button></div>
+        <button class="switch on" id="sw-rev" onclick="this.classList.toggle('on')"></button>
+      </div>
     </div>
+
     <div class="card">
-      <div class="label">⏱️ 한 사람당 설명 시간 (넘기면 자동으로 다음 차례)</div>
+      <div class="label">⏱️ 한 사람당 설명 시간 <button class="ico-i" onclick="showHelp('turntime')">i</button></div>
       <div class="chips" id="turntime-chips"></div>
     </div>
+
     <div class="card">
       <div class="label">👥 참가자 <span id="host-count" style="color:var(--text)">0</span>명</div>
       <div class="plist" id="host-players"></div>
     </div>
     <button class="btn ghost small" onclick="addBot()">🤖 테스트 참가자 추가 (혼자 연습용)</button>
     <button class="btn mt" id="start-btn" onclick="startGame()">게임 시작 🎬</button>
-    <p class="muted-c mt">최소 3명(방장 포함)부터 시작할 수 있어요.</p>
+    <p class="muted-c mt" id="min-note">최소 3명(방장 포함)부터 시작할 수 있어요.</p>
     <button class="btn ghost small mt" onclick="leaveRoom()">방 닫고 나가기</button>
   </div>
 
@@ -233,53 +266,58 @@
     <button class="btn mt" onclick="go('s-play')">준비됐어요 → 게임 시작</button>
   </div>
 
-  <!-- ===== 게임판 (턴제 설명 채팅 + 투표) ===== -->
+  <!-- ===== 게임판 ===== -->
   <div class="screen" id="s-play">
     <div class="card"><div class="turnb" id="turn-banner"></div></div>
-
     <div class="card">
       <div class="label">🗣️ 설명 순서</div>
       <div class="order" id="play-order"></div>
     </div>
-
     <div class="card">
       <div class="label">💬 설명 기록</div>
       <div class="cluefeed" id="clue-feed"></div>
     </div>
-
-    <!-- 내 차례 입력 -->
     <div class="card" id="input-card" style="display:none">
       <div class="label" id="input-label">✍️ 내 차례! (제시어를 직접 말하지 말고 돌려서)</div>
       <input class="clue" id="clue-input" maxlength="60" placeholder="예) 매콤하고 쫄깃해요" onkeydown="if(event.key==='Enter')submitClue()">
       <button class="btn small mt" onclick="submitClue()">설명 제출 📨</button>
     </div>
-
-    <!-- 투표 -->
     <div class="card" id="vote-card" style="display:none">
       <div class="label">🕵️ 라이어로 의심되는 사람에게 투표</div>
       <div class="plist" id="vote-list"></div>
     </div>
-
     <button class="btn ghost small hostonly" id="skip-btn" onclick="hostSkip()" style="display:none">⏭️ 이 차례 넘기기</button>
     <button class="btn hostonly" id="open-vote-btn" onclick="openVote()" style="display:none">🗳️ 투표 시작</button>
     <button class="btn hostonly" id="reveal-btn" onclick="reveal()" style="display:none">정답 공개 🎭</button>
     <button class="btn ghost small mt" onclick="showMyRoleAgain()">내 단어 다시 보기</button>
   </div>
 
-  <!-- ===== 정답 공개 ===== -->
+  <!-- ===== 반전 찬스 ===== -->
+  <div class="screen" id="s-guess">
+    <div class="logo"><h1 style="font-size:22px">🔁 반전 찬스</h1></div>
+    <div class="card"><div id="guess-info" class="muted-c"></div></div>
+    <div class="card" id="guess-input-card" style="display:none">
+      <div class="label">제시어가 뭐였을까요? 맞히면 역전승! 🎯</div>
+      <input class="clue" id="guess-input" maxlength="20" placeholder="제시어 입력" onkeydown="if(event.key==='Enter')submitGuess()">
+      <button class="btn small mt" onclick="submitGuess()">제출</button>
+    </div>
+  </div>
+
+  <!-- ===== 결과 ===== -->
   <div class="screen" id="s-answer">
-    <div class="logo"><h1 style="font-size:24px">🎭 정답 공개</h1></div>
+    <div class="logo"><h1 style="font-size:24px">🎭 결과</h1></div>
+    <div id="result-holder"></div>
     <div class="card">
-      <div class="label" style="text-align:center">제시어</div>
+      <div class="label" style="justify-content:center">제시어</div>
       <div class="answer-word" id="a-word">–</div>
       <div class="muted-c" id="a-cat"></div>
     </div>
     <div class="card">
-      <div class="label" style="text-align:center">진짜 라이어는</div>
-      <div class="liar-list" id="a-liars">–</div>
+      <div class="label">🎭 역할</div>
+      <div id="a-roles"></div>
     </div>
     <div class="card">
-      <div class="label">🗳️ 최다 지목</div>
+      <div class="label">🗳️ 지목 결과</div>
       <div class="plist" id="a-votes"></div>
     </div>
     <button class="btn hostonly" onclick="nextRound()">🔁 새 판 (같은 멤버)</button>
@@ -288,17 +326,23 @@
 
   <footer id="site-footer"></footer>
 </div>
+
 <div class="modal" id="peek-modal" onclick="closePeek()">
   <div class="modal-box" id="peek-box" onclick="event.stopPropagation()"></div>
 </div>
+<div class="modal" id="info-modal" onclick="closeInfo()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="info-t" id="info-t"></div>
+    <div class="info-b" id="info-b"></div>
+    <button class="btn small mt" onclick="closeInfo()">닫기</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
-<!-- Firebase (밸런스게임과 동일한 실시간 DB 재사용) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="layout.js"></script>
 <script>
-
 /* ===== 제시어 데이터 ===== */
 const WORDS = {
   "음식":["김치찌개","치킨","떡볶이","삼겹살","짜장면","마라탕","초밥","라면","곱창","붕어빵","순대","닭발","피자","햄버거","탕수육"],
@@ -308,43 +352,50 @@ const WORDS = {
   "사물":["냉장고","에어컨","칫솔","우산","리모컨","베개","안경","지갑","충전기","거울","드라이기","청소기","전자레인지","선풍기","가위"],
   "방송":["별풍선","도네이션","구독","채팅","강퇴(밴)","방송사고","뒷광고","섬네일","편집점","실시간","합방","시청자","광고","BJ","클립"]
 };
-
-/* 봇이 자기 차례에 던지는 애매한 설명 */
 const BOT_LINES=["아~ 그거 있잖아 🤔","다들 아는 그거ㅋㅋ","말하긴 좀 애매하네","완전 유명하지","나도 좋아해요 ㅎㅎ","음… 상황 봐서~","어~~ 그거~ 맞지?","은근 자주 보임"];
+
+/* ===== 설명(ⓘ) 도움말 ===== */
+const HELP={
+  modes:{t:"게임 모드",b:"<b>🎭 클래식</b> — 라이어는 제시어를 모릅니다. 시민은 라이어를 찾고, 라이어는 안 들키게 버팁니다.<br><br><b>🕵️ 스파이</b> — 클래식에 '정답을 아는 스파이'가 추가됩니다. 스파이는 라이어 편에서 감싸줍니다.<br><br><b>🤪 바보</b> — 라이어가 자기가 라이어인 줄도 모른 채 '다른 단어'를 진짜인 줄 알고 설명합니다."},
+  mode_classic:{t:"🎭 클래식",b:"라이어 1명(설정 시 여러 명)은 <b>제시어를 모릅니다</b>. 자기가 라이어인 건 압니다.<br><br>턴제로 돌아가며 설명 → 투표.<br><br><b>시민 승리</b>: 최다 득표자가 라이어일 때.<br><b>라이어 승리</b>: 순수 시민이 지목당할 때.<br><br>반전 찬스가 켜져 있으면, 라이어가 걸려도 <b>제시어를 맞히면 역전승</b>합니다."},
+  mode_spy:{t:"🕵️ 스파이",b:"클래식 + 스파이 팀전입니다.<br><br>• <b>라이어</b> 1명: 제시어를 모름<br>• <b>스파이</b> 1명: 제시어를 <b>알고</b>, 라이어가 누군지도 압니다. 라이어를 감싸주지만 <b>채팅에 제시어·주제를 직접 쓸 수 없습니다</b>.<br>• 나머지: 시민<br><br><b>시민 승리</b>: 라이어 또는 스파이가 지목당하면 → 라이어·스파이 <b>둘 다 패배</b>.<br><b>라이어+스파이 승리</b>: 순수 시민이 지목당할 때.<br><br>스파이는 이미 정답을 알기에 <b>반전 찬스는 없습니다</b>."},
+  mode_babo:{t:"🤪 바보",b:"라이어(바보) 1명은 <b>자기가 라이어인 줄 모릅니다</b>. 진짜 제시어 대신 <b>같은 주제의 다른 단어</b>를 받아, 그게 진짜인 줄 알고 설명합니다. → 혼자 엉뚱한 소리로 대혼돈!<br><br><b>시민 승리</b>: 바보가 지목당할 때.<br><b>바보 승리</b>: 순수 시민이 지목당할 때.<br><br>반전 찬스가 켜져 있으면, 바보가 걸려도 <b>진짜 제시어를 맞히면 역전승</b>합니다."},
+  liars:{t:"🕵️ 라이어 수",b:"라이어를 몇 명 둘지 정합니다(클래식). 여러 명이면 서로 누가 라이어인지 모른 채 각자 버팁니다.<br><br>※ 스파이·바보 모드에서는 라이어 1명으로 고정됩니다."},
+  hint:{t:"💡 라이어에게 주제 힌트",b:"<b>켜면</b> — 라이어에게 최소한 '주제(예: 음식)'까지는 알려줘 그럴듯하게 둘러댈 수 있게 합니다. (라이어 난이도 ↓, 초보용)<br><br><b>끄면</b> — 라이어는 아무 정보 없이 눈치로만 버팁니다. (라이어 난이도 ↑, 고인물용)<br><br>이 힌트는 <b>본인이 라이어일 때만</b> 보입니다."},
+  reversal:{t:"🔁 반전 찬스",b:"라이어가 지목당해 걸렸을 때, <b>마지막으로 제시어를 맞힐 기회</b>를 줍니다. 맞히면 라이어의 <b>역전승</b>!<br><br>라이어가 제시어를 모르는 <b>클래식·바보 모드에만</b> 적용됩니다. (스파이는 이미 정답을 알아서 제외)"},
+  turntime:{t:"⏱️ 설명 시간",b:"한 사람이 자기 차례에 설명할 수 있는 시간입니다. 시간을 넘기면 <b>자동으로 다음 차례</b>로 넘어갑니다.<br><br>방장은 '⏭️ 이 차례 넘기기'로 직접 넘길 수도 있습니다."}
+};
+function showHelp(k){ const h=HELP[k]; if(!h) return; $("info-t").innerHTML=h.t; $("info-b").innerHTML=h.b; $("info-modal").classList.add('on'); }
+function closeInfo(){ $("info-modal").classList.remove('on'); }
 
 /* ===== 전역 상태 ===== */
 let db=null, roomRef=null, code=null, myId=null, isHost=false, room=null;
-let selectedCats=["음식"], liarCount=1, roleFlipped=false, selectedTurnSec=60;
-let botStamp=null, toStamp=null;   // 봇/시간초과 자동진행 중복 방지
-const MAX_TURNS=7;                 // 설명 최대 7턴
+let selectedCats=["음식"], liarCount=1, roleFlipped=false, selectedTurnSec=60, selectedMode='classic';
+let botStamp=null, toStamp=null;
+const MAX_TURNS=7;
 
 const $=id=>document.getElementById(id);
-function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo(0,0); }
 function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
 function avatar(name){ return (name||'?').trim().charAt(0).toUpperCase()||'?'; }
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function norm(s){ return (s||'').replace(/\s/g,'').toLowerCase(); }
 
-/* ===== Firebase 연결 (layout.js가 초기화 → 공용 db 사용) ===== */
+/* ===== Firebase (layout.js가 초기화 → 공용 db) ===== */
 try{ db=(window.CHUBABE&&window.CHUBABE.db)?window.CHUBABE.db:firebase.database(); }
 catch(e){ toast("실시간 서버 연결 실패 (인터넷 확인)"); }
 
-/* ===== 카테고리 칩(방장) ===== */
-function buildCats(){
-  const box=$("host-cats"); box.innerHTML='';
-  Object.keys(WORDS).forEach(c=>{
-    const el=document.createElement('button');
-    el.className='chip'+(selectedCats.includes(c)?' on':'');
-    el.textContent=c;
-    el.onclick=()=>{
-      if(selectedCats.includes(c)){ if(selectedCats.length>1) selectedCats=selectedCats.filter(x=>x!==c); }
-      else selectedCats.push(c);
-      buildCats();
-    };
-    box.appendChild(el);
-  });
+/* ===== 설정 UI ===== */
+function pickMode(m){
+  selectedMode=m;
+  document.querySelectorAll('.modeopt').forEach(el=>el.classList.toggle('on', el.getAttribute('data-m')===m));
+  $("liar-label").style.opacity = (m!=='classic')? .45 : 1;
+  $("min-note").textContent = (m==='spy') ? "스파이 모드는 최소 4명(방장 포함)." : "최소 3명(방장 포함)부터 시작할 수 있어요.";
+  if(isHost){ const ids=Object.keys((room&&room.players)||{}); const min=(m==='spy')?4:3; if($("start-btn")) $("start-btn").disabled=ids.length<min; }
 }
-function chgLiars(d){ liarCount=Math.max(1,Math.min(3,liarCount+d)); $("v-liars").textContent=liarCount; }
+function chgLiars(d){ if(selectedMode!=='classic'){ return toast("스파이·바보 모드는 라이어 1명 고정"); }
+  liarCount=Math.max(1,Math.min(3,liarCount+d)); $("v-liars").textContent=liarCount; }
 const TURN_OPTS=[{s:60,t:'1분'},{s:180,t:'3분'},{s:300,t:'5분'}];
 function buildTurnTime(){
   const box=$("turntime-chips"); if(!box) return; box.innerHTML='';
@@ -353,23 +404,19 @@ function buildTurnTime(){
     el.onclick=()=>{ selectedTurnSec=o.s; buildTurnTime(); }; box.appendChild(el); });
 }
 
-/* ===== 방 만들기 (방장) ===== */
+/* ===== 방 만들기 / 참가 ===== */
 function createRoom(){
   if(!db) return toast("서버 연결 안 됨");
   code=String(Math.floor(1000+Math.random()*9000));
   roomRef=db.ref('liar_rooms/'+code);
   isHost=true; document.body.classList.add('is-host');
   myId=roomRef.child('players').push().key;
-  roomRef.set({
-    status:'waiting', hostId:myId, createdAt:firebase.database.ServerValue.TIMESTAMP,
-    players:{ [myId]:{ name:"쮸래기(방장)", joined:firebase.database.ServerValue.TIMESTAMP } }
-  });
+  roomRef.set({ status:'waiting', hostId:myId, createdAt:firebase.database.ServerValue.TIMESTAMP,
+    players:{ [myId]:{ name:"쮸래기(방장)", joined:firebase.database.ServerValue.TIMESTAMP } } });
   roomRef.child('players/'+myId).onDisconnect().remove();
   $("host-code").textContent=code;
-  buildCats(); buildTurnTime(); listenRoom(); go('s-host');
+  buildTurnTime(); pickMode('classic'); listenRoom(); go('s-host');
 }
-
-/* ===== 방 참가 (시청자) ===== */
 function joinRoom(){
   if(!db) return toast("서버 연결 안 됨");
   const c=$("join-code").value.trim(); const name=$("join-name").value.trim();
@@ -386,8 +433,6 @@ function joinRoom(){
     listenRoom(); go('s-lobby');
   });
 }
-
-/* ===== 테스트용 가짜 참가자 ===== */
 function addBot(){
   if(!isHost||!roomRef){ return toast("방장만 추가할 수 있어요"); }
   const players=(room&&room.players)||{};
@@ -398,7 +443,7 @@ function addBot(){
   toast(nm+" 참가!");
 }
 
-/* ===== 방 상태 실시간 반영 ===== */
+/* ===== 방 상태 반영 ===== */
 let lastStatus=null;
 function listenRoom(){
   roomRef.on('value', s=>{
@@ -406,19 +451,18 @@ function listenRoom(){
     if(!room){ toast("방이 닫혔어요"); resetAll(); go('s-home'); return; }
     const players=room.players||{};
     if(!players[room.hostId] && !isHost){ toast("방장이 나가서 방이 닫혔어요"); resetAll(); go('s-home'); return; }
-
     renderPlayers(players);
-
     if(room.status!==lastStatus){
       lastStatus=room.status; botStamp=null; toStamp=null;
       if(room.status==='playing'){ roleFlipped=false; renderRole(); renderOrder('role-order'); go('s-role'); }
+      if(room.status==='guessing'){ renderGuess(); go('s-guess'); }
       if(room.status==='reveal'){ renderAnswer(); go('s-answer'); }
       if(room.status==='waiting'){ go(isHost?'s-host':'s-lobby'); }
     }
     if(room.status==='playing') renderPlay();
+    if(room.status==='guessing') renderGuess();
   });
 }
-
 function renderPlayers(players){
   const ids=Object.keys(players);
   const mk=(box,countEl)=>{
@@ -436,29 +480,61 @@ function renderPlayers(players){
   };
   if(isHost) mk($("host-players"),$("host-count"));
   mk($("lobby-players"),$("lobby-count"));
-  if(isHost) $("start-btn").disabled = ids.length<3;
+  if(isHost){ const min=(selectedMode==='spy')?4:3; $("start-btn").disabled = ids.length<min; }
 }
 
-/* ===== 게임 시작 (방장) — 턴/라운드/설명 초기화 ===== */
+/* ===== 게임 시작 — 모드별 역할 배정 ===== */
 function startGame(){
   const players=room.players||{}; const ids=Object.keys(players);
-  if(ids.length<3) return toast("최소 3명이 필요해요");
+  const min=(selectedMode==='spy')?4:3;
+  if(ids.length<min) return toast("이 모드는 최소 "+min+"명이 필요해요");
   const cat=rnd(selectedCats);
   const word=rnd(WORDS[cat]);
   const hint=$("sw-hint").classList.contains('on');
-  const nLiar=Math.min(liarCount, ids.length-2);
+  const reversal=$("sw-rev").classList.contains('on');
   const shuffled=[...ids].sort(()=>Math.random()-0.5);
-  const liars=new Set(shuffled.slice(0,nLiar));
   const order=[...ids].sort(()=>Math.random()-0.5);
-  const upd={ status:'playing', word, category:cat, hint, order,
-              turnIdx:0, round:1, voteOpen:false, clues:null,
-              turnSec:selectedTurnSec, maxTurns:MAX_TURNS,
-              turnEndsAt: Date.now()+selectedTurnSec*1000 };
-  ids.forEach(id=>{ upd['players/'+id+'/isLiar']=liars.has(id); upd['players/'+id+'/vote']=null; });
+
+  const roles={}; ids.forEach(id=>roles[id]='citizen');
+  let liarId=null, spyId=null, foolId=null, foolWord=null;
+  if(selectedMode==='classic'){
+    const n=Math.min(liarCount, ids.length-2);
+    shuffled.slice(0,n).forEach(id=>roles[id]='liar'); liarId=shuffled[0];
+  }else if(selectedMode==='spy'){
+    liarId=shuffled[0]; spyId=shuffled[1];
+    roles[liarId]='liar'; roles[spyId]='spy';
+  }else if(selectedMode==='babo'){
+    foolId=shuffled[0]; roles[foolId]='fool';
+    const pool=WORDS[cat].filter(w=>w!==word); foolWord=rnd(pool);
+  }
+
+  const upd={ status:'playing', mode:selectedMode, reversal, word, category:cat, hint, order,
+    liarId, spyId, foolId, foolWord,
+    turnIdx:0, round:1, voteOpen:false, clues:null, guessBy:null, guess:null, caughtId:null,
+    turnSec:selectedTurnSec, maxTurns:MAX_TURNS, turnEndsAt: Date.now()+selectedTurnSec*1000 };
+  ids.forEach(id=>{ upd['players/'+id+'/role']=roles[id]; upd['players/'+id+'/vote']=null; });
   roomRef.update(upd);
 }
 
-/* ===== 내 역할 ===== */
+/* ===== 내 역할 화면 ===== */
+function myWordView(){
+  const me=(room.players||{})[myId]||{}; const role=me.role||'citizen';
+  if(role==='liar'){
+    return {cls:'cardface liar', html:'<div class="hint-top">'+(room.hint?('주제: <b style="color:#fff">'+esc(room.category)+'</b>'):'&nbsp;')+'</div>'+
+      '<div class="word">당신은 라이어 🤫</div><div class="sub">제시어를 모릅니다.<br>들키지 않게 아는 척하세요!</div>'};
+  }
+  if(role==='spy'){
+    const liarNm=((room.players||{})[room.liarId]||{}).name||'?';
+    return {cls:'cardface spy', html:'<div class="hint-top">제시어: <b style="color:#fff">'+esc(room.word)+'</b></div>'+
+      '<div class="word">🕵️ 스파이</div><div class="sub">라이어는 <b style="color:#4dc3ff">'+esc(liarNm)+'</b> 님!<br>라이어를 감싸주세요.<br>단, 제시어·주제는 채팅에 못 씁니다.</div>'};
+  }
+  if(role==='fool'){
+    return {cls:'cardface', html:'<div class="hint-top">주제: <b>'+esc(room.category)+'</b></div>'+
+      '<div class="word">'+esc(room.foolWord)+'</div><div class="sub">이 단어를 직접 말하지 말고<br>돌려서 설명하세요</div>'};
+  }
+  return {cls:'cardface', html:'<div class="hint-top">주제: <b>'+esc(room.category)+'</b></div>'+
+    '<div class="word">'+esc(room.word)+'</div><div class="sub">이 단어를 직접 말하지 말고<br>돌려서 설명하세요</div>'};
+}
 function renderRole(){
   roleFlipped=false;
   const card=$("role-card"); card.className='cardface';
@@ -466,42 +542,24 @@ function renderRole(){
 }
 function flipRole(){
   if(roleFlipped) return; roleFlipped=true;
-  const me=(room.players||{})[myId]; if(!me) return;
-  const card=$("role-card");
-  if(me.isLiar){
-    card.className='cardface liar';
-    card.innerHTML='<div class="hint-top">'+(room.hint?('주제: <b style="color:#fff">'+room.category+'</b>'):'&nbsp;')+'</div>'+
-      '<div class="word">당신은 라이어 🤫</div><div class="sub">제시어를 모릅니다.<br>들키지 않게 아는 척하세요!</div>';
-  }else{
-    card.className='cardface';
-    card.innerHTML='<div class="hint-top">주제: <b>'+room.category+'</b></div>'+
-      '<div class="word">'+room.word+'</div><div class="sub">이 단어를 직접 말하지 말고<br>돌려서 설명하세요</div>';
-  }
+  const v=myWordView(); const card=$("role-card"); card.className=v.cls; card.innerHTML=v.html;
 }
 function showMyRoleAgain(){ openPeek(); }
 function openPeek(){
-  const me=(room.players||{})[myId]; if(!me) return;
-  const box=$("peek-box");
-  if(me.isLiar){
-    box.className='modal-box liarbox';
-    box.innerHTML='<div class="pk-top">'+(room.hint?('주제: '+esc(room.category)):'&nbsp;')+'</div><div class="pk-word" style="color:var(--accent)">라이어 🤫</div><div class="pk-sub">제시어를 모릅니다</div><button class="btn small mt" onclick="closePeek()">닫기</button>';
-  }else{
-    box.className='modal-box';
-    box.innerHTML='<div class="pk-top">주제: '+esc(room.category)+'</div><div class="pk-word">'+esc(room.word)+'</div><div class="pk-sub">직접 말하지 말고 돌려서!</div><button class="btn small mt" onclick="closePeek()">닫기</button>';
-  }
+  const v=myWordView(); const box=$("peek-box");
+  box.className='modal-box'+(v.cls.includes('liar')?' liarbox':(v.cls.includes('spy')?' spybox':''));
+  box.innerHTML=v.html+'<button class="btn small mt" onclick="closePeek()">닫기</button>';
   $("peek-modal").classList.add('on');
 }
 function closePeek(){ $("peek-modal").classList.remove('on'); }
 
-/* 설명 순서 뱃지 (id 대상: role-order 또는 play-order) */
 function renderOrder(boxId){
-  const players=room.players||{}; const order=room.order||[];
-  const cur=room.turnIdx||0;
+  const players=room.players||{}; const order=room.order||[]; const cur=room.turnIdx||0;
   const box=$(boxId); if(!box) return;
   box.innerHTML=order.map((id,i)=>{
     let cls='obadge';
     if(boxId==='play-order' && !room.voteOpen){ if(i===cur) cls+=' now'; else if(i<cur) cls+=' done'; }
-    return '<div class="'+cls+'"><span class="n">'+(i+1)+'</span>'+((players[id]||{}).name||'?')+'</div>';
+    return '<div class="'+cls+'"><span class="n">'+(i+1)+'</span>'+esc((players[id]||{}).name||'?')+'</div>';
   }).join('');
 }
 
@@ -511,101 +569,86 @@ function renderPlay(){
   const voteOpen=!!room.voteOpen;
   const curId=order[room.turnIdx||0];
   const isMyTurn=(curId===myId)&&!voteOpen;
-
-  // 턴 배너
   const cluesN=Object.keys(room.clues||{}).length;
   const maxT=room.maxTurns||MAX_TURNS;
+
   const b=$("turn-banner");
-  if(voteOpen){
-    b.innerHTML='<div class="big">🗳️ 투표 진행 중</div><div class="rnd">라이어를 지목하세요</div>';
-  }else if(isMyTurn){
-    b.innerHTML='<div class="big mine">🎤 내 차례! <span class="clock" id="turn-timer"></span></div><div class="rnd">설명 입력 · '+cluesN+'/'+maxT+'턴 · '+(room.round||1)+'R</div>';
-  }else{
-    const nm=(players[curId]||{}).name||'?';
-    b.innerHTML='<div class="big">🎤 '+esc(nm)+' 차례 <span class="clock" id="turn-timer"></span></div><div class="rnd">기다리는 중… · '+cluesN+'/'+maxT+'턴 · '+(room.round||1)+'R</div>';
-  }
+  if(voteOpen){ b.innerHTML='<div class="big">🗳️ 투표 진행 중</div><div class="rnd">라이어를 지목하세요</div>'; }
+  else if(isMyTurn){ b.innerHTML='<div class="big mine">🎤 내 차례! <span class="clock" id="turn-timer"></span></div><div class="rnd">설명 입력 · '+cluesN+'/'+maxT+'턴 · '+(room.round||1)+'R</div>'; }
+  else{ const nm=(players[curId]||{}).name||'?'; b.innerHTML='<div class="big">🎤 '+esc(nm)+' 차례 <span class="clock" id="turn-timer"></span></div><div class="rnd">기다리는 중… · '+cluesN+'/'+maxT+'턴 · '+(room.round||1)+'R</div>'; }
 
   renderOrder('play-order');
   renderClues();
-
   $("input-card").style.display = isMyTurn ? 'block' : 'none';
   $("vote-card").style.display  = voteOpen ? 'block' : 'none';
   if(voteOpen) renderVoteList(players);
-
   $("skip-btn").style.display = (isHost && !voteOpen) ? 'block' : 'none';
   $("open-vote-btn").style.display = (isHost && !voteOpen) ? 'block' : 'none';
-  $("reveal-btn").style.display    = (isHost && voteOpen) ? 'block' : 'none';
-
+  $("reveal-btn").style.display = (isHost && voteOpen) ? 'block' : 'none';
   maybeBotPlay(curId, voteOpen);
 }
-
 function renderClues(){
   const feed=$("clue-feed"); if(!feed) return;
-  const clues=room.clues||{};
-  const keys=Object.keys(clues).sort();
+  const clues=room.clues||{}; const keys=Object.keys(clues).sort();
   if(!keys.length){ feed.innerHTML='<div class="feed-empty">아직 설명이 없어요. 첫 차례부터 시작!</div>'; return; }
-  feed.innerHTML=keys.map(k=>{
-    const c=clues[k]; const mine=c.by===myId;
-    return '<div class="clueitem'+(mine?' mine':'')+'">'+
-      '<div class="ca">'+avatar(c.name)+'</div>'+
+  feed.innerHTML=keys.map(k=>{ const c=clues[k]; const mine=c.by===myId;
+    return '<div class="clueitem'+(mine?' mine':'')+'"><div class="ca">'+avatar(c.name)+'</div>'+
       '<div class="cb"><div class="cn">'+esc(c.name)+'<span class="rr">R'+(c.round||1)+'</span></div>'+
       '<div class="ct">'+esc(c.text)+'</div></div></div>';
   }).join('');
   feed.scrollTop=feed.scrollHeight;
 }
-
-/* 설명 제출 → 기록 추가 + 턴 넘김 (현재 차례인 사람만 씀) */
 function submitClue(){
   const order=room.order||[]; const curId=order[room.turnIdx||0];
   if(curId!==myId) return toast("아직 차례가 아니에요");
   if(room.voteOpen) return;
   const txt=$("clue-input").value.trim();
   if(!txt) return toast("설명을 입력하세요");
+  const myRole=((room.players||{})[myId]||{}).role;
+  if(myRole==='spy'){
+    const n=norm(txt);
+    if(n.includes(norm(room.word)) || n.includes(norm(room.category)))
+      return toast("스파이는 제시어·주제를 직접 쓸 수 없어요!");
+  }
   $("clue-input").value='';
   postClue(myId, txt);
 }
 function postClue(pid, txt){
-  const players=room.players||{}; const order=room.order||[];
-  const round=room.round||1;
+  const players=room.players||{}; const order=room.order||[]; const round=room.round||1;
   const key=roomRef.child('clues').push().key;
   const upd={};
   upd['clues/'+key]={ by:pid, name:(players[pid]||{}).name||'?', text:txt, round };
-  const count=Object.keys(room.clues||{}).length+1;   // 이번 설명 포함
+  const count=Object.keys(room.clues||{}).length+1;
   let ni=(room.turnIdx||0)+1, nr=round;
   if(ni>=order.length){ ni=0; nr=round+1; }
   upd['turnIdx']=ni; upd['round']=nr;
   upd['turnEndsAt']= room.turnSec ? (Date.now()+room.turnSec*1000) : null;
-  if(count >= (room.maxTurns||MAX_TURNS)) upd['voteOpen']=true;   // 최대 7턴 -> 자동 투표
+  if(count >= (room.maxTurns||MAX_TURNS)) upd['voteOpen']=true;
   roomRef.update(upd);
 }
-
-/* 봇 차례면 방장 클라가 자동으로 한마디 (혼자 테스트용) */
 function maybeBotPlay(curId, voteOpen){
   if(!isHost || voteOpen) return;
   const cur=(room.players||{})[curId];
   if(!cur || !cur.bot) return;
   const stamp=(room.round||1)+'-'+(room.turnIdx||0);
-  if(botStamp===stamp) return;
-  botStamp=stamp;
+  if(botStamp===stamp) return; botStamp=stamp;
   setTimeout(()=>{
     if(!room || room.status!=='playing' || room.voteOpen) return;
-    const order=room.order||[];
-    if(order[room.turnIdx||0]!==curId) return; // 이미 넘어감
+    const order=room.order||[]; if(order[room.turnIdx||0]!==curId) return;
     postClue(curId, rnd(BOT_LINES));
   }, 1500);
 }
-
-/* ===== 투표 ===== */
-function openVote(){ if(isHost) roomRef.child('voteOpen').set(true); }
 function hostSkip(){
   if(!isHost || !room || room.voteOpen) return;
   const order=room.order||[]; const curId=order[room.turnIdx||0];
   if(curId) postClue(curId, '⏭️ (넘김)');
 }
+
+/* ===== 투표 ===== */
+function openVote(){ if(isHost) roomRef.child('voteOpen').set(true); }
 function renderVoteList(players){
   const box=$("vote-list"); if(!box) return;
-  const ids=Object.keys(players);
-  const myVote=(players[myId]||{}).vote;
+  const ids=Object.keys(players); const myVote=(players[myId]||{}).vote;
   const tally={}; ids.forEach(id=>{ const v=(players[id]||{}).vote; if(v) tally[v]=(tally[v]||0)+1; });
   box.innerHTML='';
   ids.forEach(id=>{
@@ -613,57 +656,121 @@ function renderVoteList(players){
     const p=players[id];
     const btn=document.createElement('button');
     btn.className='vote-btn'+(myVote===id?' sel':'');
-    btn.innerHTML='<div class="av" style="width:26px;height:26px;font-size:12px">'+avatar(p.name)+'</div>'+p.name+
-      '<span class="cnt">'+(tally[id]||0)+'</span>';
+    btn.innerHTML='<div class="av" style="width:26px;height:26px;font-size:12px">'+avatar(p.name)+'</div>'+p.name+'<span class="cnt">'+(tally[id]||0)+'</span>';
     btn.onclick=()=>castVote(id);
     box.appendChild(btn);
   });
 }
-function castVote(targetId){
-  const myVote=((room.players||{})[myId]||{}).vote;
-  roomRef.child('players/'+myId+'/vote').set(myVote===targetId?null:targetId);
+function castVote(t){ const mv=((room.players||{})[myId]||{}).vote; roomRef.child('players/'+myId+'/vote').set(mv===t?null:t); }
+
+function tallyTop(){
+  const players=room.players||{}; const ids=Object.keys(players);
+  const t={}; ids.forEach(id=>{ const v=players[id].vote; if(v) t[v]=(t[v]||0)+1; });
+  let max=0; ids.forEach(id=>{ if((t[id]||0)>max) max=t[id]||0; });
+  const top=ids.filter(id=>(t[id]||0)===max && max>0);
+  return { caughtId: top.length===1? top[0]:null, tally:t, max };
 }
 
-/* ===== 정답 공개 ===== */
-function reveal(){ if(isHost) roomRef.child('status').set('reveal'); }
+/* ===== 정답 공개 (반전 판단) ===== */
+function reveal(){
+  if(!isHost) return;
+  const {caughtId}=tallyTop();
+  const cr = caughtId? ((room.players||{})[caughtId]||{}).role : null;
+  const needGuess = !!room.reversal && ((room.mode==='classic'&&cr==='liar')||(room.mode==='babo'&&cr==='fool'));
+  if(needGuess) roomRef.update({ status:'guessing', guessBy:caughtId, caughtId });
+  else roomRef.update({ status:'reveal', caughtId:caughtId||null });
+}
+
+/* ===== 반전 찬스 화면 ===== */
+function renderGuess(){
+  const nm=((room.players||{})[room.guessBy]||{}).name||'?';
+  const mine=(room.guessBy===myId);
+  $("guess-info").innerHTML = mine
+    ? '🎯 <b style="color:var(--accent)">당신이 지목됐습니다!</b><br>제시어를 맞히면 역전승입니다.'
+    : '⏳ <b>'+esc(nm)+'</b> 님이 제시어를 맞히는 중…';
+  $("guess-input-card").style.display = mine ? 'block' : 'none';
+}
+function submitGuess(){
+  if(room.guessBy!==myId) return;
+  const g=$("guess-input").value.trim(); if(!g) return toast("입력하세요");
+  roomRef.update({ guess:g, status:'reveal' });
+}
+
+/* ===== 결과 계산 ===== */
+function computeResult(){
+  const mode=room.mode||'classic';
+  const caughtId=room.caughtId;
+  const caughtRole = caughtId? ((room.players||{})[caughtId]||{}).role : null;
+  const guessRight = room.guess!=null && norm(room.guess)===norm(room.word);
+  if(mode==='spy'){
+    return (caughtRole==='liar'||caughtRole==='spy')
+      ? {win:'citizen', title:'🎉 시민 승리!', detail:'라이어·스파이를 잡아냈습니다.'}
+      : {win:'liar', title:'😈 라이어+스파이 승리!', detail:'순수 시민이 지목당했습니다.'};
+  }
+  const badRole = (mode==='babo')?'fool':'liar';
+  const badName = (mode==='babo')?'바보':'라이어';
+  if(caughtRole===badRole){
+    if(room.reversal && room.guess!=null){
+      return guessRight
+        ? {win:'liar', title:'🔁 '+badName+' 역전승!', detail:'걸렸지만 제시어("'+esc(room.word)+'")를 맞혔습니다!'}
+        : {win:'citizen', title:'🎉 시민 승리!', detail:badName+'가 제시어를 못 맞혔습니다. (답: '+esc(room.guess)+')'};
+    }
+    return {win:'citizen', title:'🎉 시민 승리!', detail:badName+'를 잡아냈습니다.'};
+  }
+  return {win:'liar', title:'😈 '+badName+' 승리!', detail:'순수 시민이 지목당했거나 표가 갈렸습니다.'};
+}
+function roleLabel(role){
+  return role==='liar'?['라이어','#ff4d8d']
+    : role==='spy'?['스파이','#4dc3ff']
+    : role==='fool'?['바보','#ffb03a']
+    : ['시민','#9c98b5'];
+}
 function renderAnswer(){
   const players=room.players||{}; const ids=Object.keys(players);
+  const res=computeResult();
+  $("result-holder").innerHTML='<div class="result-box '+(res.win==='citizen'?'citizen':'liar')+'">'+
+    '<div class="rw">'+res.title+'</div><div class="rd">'+res.detail+'</div></div>';
   $("a-word").textContent=room.word||'–';
-  $("a-cat").textContent='주제: '+(room.category||'');
-  const liars=ids.filter(id=>players[id].isLiar).map(id=>players[id].name);
-  $("a-liars").textContent=liars.join(', ')||'–';
-  const tally={}; ids.forEach(id=>{ const v=players[id].vote; if(v) tally[v]=(tally[v]||0)+1; });
-  const max=Math.max(0,...Object.values(tally));
+  $("a-cat").textContent='주제: '+(room.category||'')+(room.mode==='babo'&&room.foolWord?(' · 바보 단어: '+room.foolWord):'');
+
+  const rolesBox=$("a-roles"); rolesBox.innerHTML='';
+  ['liar','spy','fool'].forEach(role=>{
+    ids.filter(id=>players[id].role===role).forEach(id=>{
+      const [lb,col]=roleLabel(role);
+      const el=document.createElement('div'); el.className='rolerow';
+      el.innerHTML='<div class="av" style="width:26px;height:26px;font-size:12px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:900">'+avatar(players[id].name)+'</div>'+esc(players[id].name)+
+        '<span class="rtag" style="background:'+col+';color:#111">'+lb+'</span>';
+      rolesBox.appendChild(el);
+    });
+  });
+  if(!rolesBox.innerHTML) rolesBox.innerHTML='<div class="muted-c">—</div>';
+
+  const t={}; ids.forEach(id=>{ const v=players[id].vote; if(v) t[v]=(t[v]||0)+1; });
+  const max=Math.max(0,...Object.values(t));
   const box=$("a-votes"); box.innerHTML='';
-  ids.map(id=>({id,n:tally[id]||0})).sort((a,b)=>b.n-a.n).forEach(o=>{
-    const p=players[o.id]; const top=(o.n>0&&o.n===max);
-    const el=document.createElement('div'); el.className='pill'; if(p.isLiar) el.style.borderColor='var(--accent)';
-    el.innerHTML='<div class="av">'+avatar(p.name)+'</div>'+p.name+
-      (p.isLiar?' <span style="color:var(--accent);font-size:12px;font-weight:900">라이어</span>':'')+
+  ids.map(id=>({id,n:t[id]||0})).sort((a,b)=>b.n-a.n).forEach(o=>{
+    const p=players[o.id]; const top=(o.n>0&&o.n===max); const [lb,col]=roleLabel(p.role);
+    const el=document.createElement('div'); el.className='pill';
+    el.innerHTML='<div class="av">'+avatar(p.name)+'</div>'+esc(p.name)+
+      ' <span style="font-size:11px;color:'+col+';font-weight:900">'+lb+'</span>'+
       '<span class="tag" style="color:'+(top?'var(--accent)':'var(--muted)')+'">'+o.n+'표'+(top?' 👈':'')+'</span>';
     box.appendChild(el);
   });
 }
 function nextRound(){ if(isHost) startGame(); }
 
-/* ===== 나가기 / 정리 ===== */
+/* ===== 나가기 ===== */
 function leaveRoom(){
-  try{
-    if(roomRef&&myId){
-      if(isHost) roomRef.remove();
-      else roomRef.child('players/'+myId).remove();
-      roomRef.off();
-    }
-  }catch(e){}
+  try{ if(roomRef&&myId){ if(isHost) roomRef.remove(); else roomRef.child('players/'+myId).remove(); roomRef.off(); } }catch(e){}
   resetAll(); go('s-home');
 }
 function resetAll(){ roomRef=null; code=null; myId=null; isHost=false; room=null; lastStatus=null; botStamp=null; toStamp=null;
   document.body.classList.remove('is-host'); }
-
 function copyCode(){
   const url=location.origin+location.pathname+'?room='+code;
   navigator.clipboard?.writeText(url).then(()=>toast("참가 링크 복사됨!"),()=>toast("코드: "+code));
 }
+
 /* 턴 카운트다운 + 시간초과 자동 진행 */
 setInterval(function(){
   if(!room || room.status!=='playing' || room.voteOpen) return;
