@@ -80,10 +80,14 @@
     try{
       if(!CHUBABE.db) return;
       var db=CHUBABE.db, presRef=db.ref('presence'), conRef=db.ref('.info/connected');
-      var myRef=null;
-      function beat(){ if(myRef) myRef.set(Date.now()); }   // lastSeen 갱신
+      // 탭당 고정 ID(sessionStorage): 같은 탭에서 페이지 이동해도 같은 슬롯 재사용 -> 누적 안됨
+      var id=null;
+      try{ id=sessionStorage.getItem('cbv_pid'); if(!id){ id='p'+Math.random().toString(36).slice(2)+Date.now().toString(36); sessionStorage.setItem('cbv_pid',id); } }
+      catch(e){ id='p'+Math.random().toString(36).slice(2); }
+      var myRef=presRef.child(id);
+      function beat(){ myRef.set(Date.now()); }   // lastSeen 갱신
       conRef.on('value', function(s){
-        if(s.val()===true){ myRef=presRef.push(); myRef.onDisconnect().remove(); beat(); }
+        if(s.val()===true){ myRef.onDisconnect().remove(); beat(); }
       });
       setInterval(beat, 15000);   // 15초마다 살아있음 신호
       presRef.on('value', function(s){
