@@ -232,6 +232,14 @@
       <div class="label">⏱️ 한 사람당 설명 시간 <button class="ico-i" onclick="showHelp('turntime')">i</button></div>
       <div class="chips" id="turntime-chips"></div>
     </div>
+    <div class="card">
+      <div class="label">🔁 설명 턴 수 (전원 한 바퀴 = 1턴) <button class="ico-i" onclick="showHelp('rounds')">i</button></div>
+      <div class="stepper">
+        <button class="rbtn" onclick="chgRounds(-1)">−</button>
+        <div class="val" id="v-rounds">3</div>
+        <button class="rbtn" onclick="chgRounds(1)">＋</button>
+      </div>
+    </div>
 
     <div class="card">
       <div class="label">👥 참가자 <span id="host-count" style="color:var(--text)">0</span>명</div>
@@ -363,14 +371,15 @@ const HELP={
   liars:{t:"🕵️ 라이어 수",b:"라이어를 몇 명 둘지 정합니다(클래식). 여러 명이면 서로 누가 라이어인지 모른 채 각자 버팁니다.<br><br>※ 스파이·바보 모드에서는 라이어 1명으로 고정됩니다."},
   hint:{t:"💡 라이어에게 주제 힌트",b:"<b>켜면</b> — 라이어에게 최소한 '주제(예: 음식)'까지는 알려줘 그럴듯하게 둘러댈 수 있게 합니다. (라이어 난이도 ↓, 초보용)<br><br><b>끄면</b> — 라이어는 아무 정보 없이 눈치로만 버팁니다. (라이어 난이도 ↑, 고인물용)<br><br>이 힌트는 <b>본인이 라이어일 때만</b> 보입니다."},
   reversal:{t:"🔁 반전 찬스",b:"라이어가 지목당해 걸렸을 때, <b>마지막으로 제시어를 맞힐 기회</b>를 줍니다. 맞히면 라이어의 <b>역전승</b>!<br><br>라이어가 제시어를 모르는 <b>클래식·바보 모드에만</b> 적용됩니다. (스파이는 이미 정답을 알아서 제외)"},
-  turntime:{t:"⏱️ 설명 시간",b:"한 사람이 자기 차례에 설명할 수 있는 시간입니다. 시간을 넘기면 <b>자동으로 다음 차례</b>로 넘어갑니다.<br><br>방장은 '⏭️ 이 차례 넘기기'로 직접 넘길 수도 있습니다."}
+  turntime:{t:"⏱️ 설명 시간",b:"한 사람이 자기 차례에 설명할 수 있는 시간입니다. 시간을 넘기면 <b>자동으로 다음 차례</b>로 넘어갑니다.<br><br>방장은 '⏭️ 이 차례 넘기기'로 직접 넘길 수도 있습니다."},
+  rounds:{t:"🔁 설명 턴 수",b:"<b>전원이 한 바퀴 다 설명하면 1턴</b>입니다. 예: 5명이면 5명이 한 번씩 설명 = 1턴, 또 한 바퀴 = 2턴.<br><br>설정한 턴 수만큼 돌면 자동으로 투표로 넘어갑니다. 방장은 '🗳️ 투표 시작'으로 언제든 먼저 열 수도 있습니다."}
 };
 function showHelp(k){ const h=HELP[k]; if(!h) return; $("info-t").innerHTML=h.t; $("info-b").innerHTML=h.b; $("info-modal").classList.add('on'); }
 function closeInfo(){ $("info-modal").classList.remove('on'); }
 
 /* ===== 전역 상태 ===== */
 let db=null, roomRef=null, code=null, myId=null, isHost=false, room=null;
-let selectedCats=["음식"], liarCount=1, roleFlipped=false, selectedTurnSec=60, selectedMode='classic';
+let selectedCats=["음식"], liarCount=1, roleFlipped=false, selectedTurnSec=60, selectedMode='classic', selectedRounds=3;
 let botStamp=null, toStamp=null;
 const MAX_TURNS=7;
 
@@ -396,6 +405,7 @@ function pickMode(m){
 }
 function chgLiars(d){ if(selectedMode!=='classic'){ return toast("스파이·바보 모드는 라이어 1명 고정"); }
   liarCount=Math.max(1,Math.min(3,liarCount+d)); $("v-liars").textContent=liarCount; }
+function chgRounds(d){ selectedRounds=Math.max(1,Math.min(7,selectedRounds+d)); $("v-rounds").textContent=selectedRounds; }
 const TURN_OPTS=[{s:60,t:'1분'},{s:180,t:'3분'},{s:300,t:'5분'}];
 function buildTurnTime(){
   const box=$("turntime-chips"); if(!box) return; box.innerHTML='';
@@ -511,7 +521,7 @@ function startGame(){
   const upd={ status:'playing', mode:selectedMode, reversal, word, category:cat, hint, order,
     liarId, spyId, foolId, foolWord,
     turnIdx:0, round:1, voteOpen:false, clues:null, guessBy:null, guess:null, caughtId:null,
-    turnSec:selectedTurnSec, maxTurns:MAX_TURNS, turnEndsAt: Date.now()+selectedTurnSec*1000 };
+    turnSec:selectedTurnSec, maxRounds:selectedRounds, turnEndsAt: Date.now()+selectedTurnSec*1000 };
   ids.forEach(id=>{ upd['players/'+id+'/role']=roles[id]; upd['players/'+id+'/vote']=null; });
   roomRef.update(upd);
 }
@@ -570,12 +580,12 @@ function renderPlay(){
   const curId=order[room.turnIdx||0];
   const isMyTurn=(curId===myId)&&!voteOpen;
   const cluesN=Object.keys(room.clues||{}).length;
-  const maxT=room.maxTurns||MAX_TURNS;
+  const maxR=room.maxRounds||3;
 
   const b=$("turn-banner");
   if(voteOpen){ b.innerHTML='<div class="big">🗳️ 투표 진행 중</div><div class="rnd">라이어를 지목하세요</div>'; }
-  else if(isMyTurn){ b.innerHTML='<div class="big mine">🎤 내 차례! <span class="clock" id="turn-timer"></span></div><div class="rnd">설명 입력 · '+cluesN+'/'+maxT+'턴 · '+(room.round||1)+'R</div>'; }
-  else{ const nm=(players[curId]||{}).name||'?'; b.innerHTML='<div class="big">🎤 '+esc(nm)+' 차례 <span class="clock" id="turn-timer"></span></div><div class="rnd">기다리는 중… · '+cluesN+'/'+maxT+'턴 · '+(room.round||1)+'R</div>'; }
+  else if(isMyTurn){ b.innerHTML='<div class="big mine">🎤 내 차례! <span class="clock" id="turn-timer"></span></div><div class="rnd">설명 입력 · '+(room.round||1)+'/'+maxR+'턴</div>'; }
+  else{ const nm=(players[curId]||{}).name||'?'; b.innerHTML='<div class="big">🎤 '+esc(nm)+' 차례 <span class="clock" id="turn-timer"></span></div><div class="rnd">기다리는 중… · '+(room.round||1)+'/'+maxR+'턴</div>'; }
 
   renderOrder('play-order');
   renderClues();
@@ -618,12 +628,13 @@ function postClue(pid, txt){
   const key=roomRef.child('clues').push().key;
   const upd={};
   upd['clues/'+key]={ by:pid, name:(players[pid]||{}).name||'?', text:txt, round };
-  const count=Object.keys(room.clues||{}).length+1;
   let ni=(room.turnIdx||0)+1, nr=round;
-  if(ni>=order.length){ ni=0; nr=round+1; }
+  const wrapped = ni>=order.length;   // 전원 한 바퀴 다 돌면 1턴 완료
+  if(wrapped){ ni=0; nr=round+1; }
   upd['turnIdx']=ni; upd['round']=nr;
   upd['turnEndsAt']= room.turnSec ? (Date.now()+room.turnSec*1000) : null;
-  if(count >= (room.maxTurns||MAX_TURNS)) upd['voteOpen']=true;
+  const maxR = room.maxRounds||3;
+  if(wrapped && round>=maxR) upd['voteOpen']=true;   // maxR턴 완료 -> 자동 투표
   roomRef.update(upd);
 }
 function maybeBotPlay(curId, voteOpen){
