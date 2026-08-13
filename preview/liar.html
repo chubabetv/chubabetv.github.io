@@ -233,7 +233,7 @@
       <div class="chips" id="turntime-chips"></div>
     </div>
     <div class="card">
-      <div class="label">🔁 설명 턴 수 (전원 한 바퀴 = 1턴) <button class="ico-i" onclick="showHelp('rounds')">i</button></div>
+      <div class="label">🔁 설명 턴 수 (전원 한 바퀴 = 1턴 · 3~7) <button class="ico-i" onclick="showHelp('rounds')">i</button></div>
       <div class="stepper">
         <button class="rbtn" onclick="chgRounds(-1)">−</button>
         <div class="val" id="v-rounds">3</div>
@@ -405,7 +405,7 @@ function pickMode(m){
 }
 function chgLiars(d){ if(selectedMode!=='classic'){ return toast("스파이·바보 모드는 라이어 1명 고정"); }
   liarCount=Math.max(1,Math.min(3,liarCount+d)); $("v-liars").textContent=liarCount; }
-function chgRounds(d){ selectedRounds=Math.max(1,Math.min(7,selectedRounds+d)); $("v-rounds").textContent=selectedRounds; }
+function chgRounds(d){ selectedRounds=Math.max(3,Math.min(7,selectedRounds+d)); $("v-rounds").textContent=selectedRounds; }
 const TURN_OPTS=[{s:60,t:'1분'},{s:180,t:'3분'},{s:300,t:'5분'}];
 function buildTurnTime(){
   const box=$("turntime-chips"); if(!box) return; box.innerHTML='';
