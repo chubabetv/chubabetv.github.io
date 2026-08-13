@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>쮸래기 라이어게임 (실시간 시참)</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root{
+    --bg:#12101c; --card:#1e1b2e; --card2:#272341;
+    --accent:#ff4d8d; --accent2:#7b5cff; --text:#f4f2ff; --muted:#9c98b5;
+    --good:#33d69f; --line:#332f4a; --warn:#ffb03a;
+  }
+  html,body{height:100%;}
+  body{
+    font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+    background:radial-gradient(120% 80% at 50% -10%,#2a2140 0%,var(--bg) 55%);
+    color:var(--text); min-height:100dvh;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:16px; overflow-x:hidden;
+  }
+  .app{ width:100%; max-width:460px; margin:auto; }
+  .screen{ display:none; animation:fade .3s ease; }
+  .screen.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+  .logo{ text-align:center; margin:10px 0 22px; }
+  .logo h1{ font-size:30px; font-weight:900; letter-spacing:-1px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .logo p{ color:var(--muted); font-size:13px; margin-top:6px; }
+  .status-dot{ display:inline-flex; align-items:center; gap:5px; font-size:12px; color:var(--muted); }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px; margin-bottom:14px; }
+  .label{ font-size:13px; color:var(--muted); margin-bottom:10px; font-weight:700; }
+
+  .btn{ width:100%; padding:17px; border-radius:16px; border:none; font-size:17px; font-weight:900;
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff; cursor:pointer;
+    transition:.15s; box-shadow:0 8px 24px rgba(123,92,255,.32); }
+  .btn:active{ transform:translateY(2px); box-shadow:0 3px 12px rgba(123,92,255,.3); }
+  .btn.ghost{ background:var(--card); border:1px solid var(--line); box-shadow:none; color:var(--text); }
+  .btn.small{ padding:13px; font-size:15px; }
+  .btn:disabled{ opacity:.4; cursor:default; transform:none; }
+  .mt{ margin-top:12px; }
+  .row{ display:flex; gap:10px; }
+
+  input{ width:100%; background:var(--card2); border:1px solid var(--line); border-radius:14px;
+    color:var(--text); padding:15px; font-size:17px; font-family:inherit; text-align:center; font-weight:700; }
+  input.code{ letter-spacing:8px; font-size:26px; }
+
+  .stepper{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .stepper .val{ font-size:26px; font-weight:900; min-width:50px; text-align:center; }
+  .rbtn{ width:48px; height:48px; border-radius:14px; border:none; font-size:24px; font-weight:800;
+    background:var(--card2); color:var(--text); cursor:pointer; transition:.15s; }
+  .rbtn:active{ transform:scale(.9); background:var(--accent2); }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ padding:9px 14px; border-radius:13px; background:var(--card2); border:1px solid transparent;
+    color:var(--text); font-size:14px; font-weight:700; cursor:pointer; transition:.15s; }
+  .chip.on{ background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+
+  .toggle{ display:flex; align-items:center; justify-content:space-between; }
+  .switch{ width:54px; height:31px; border-radius:20px; background:var(--card2); position:relative; cursor:pointer; transition:.2s; border:none; }
+  .switch.on{ background:var(--good); }
+  .switch::after{ content:''; position:absolute; width:25px; height:25px; border-radius:50%; background:#fff; top:3px; left:3px; transition:.2s; }
+  .switch.on::after{ left:26px; }
+
+  .codebig{ text-align:center; }
+  .codebig .cc{ font-size:56px; font-weight:900; letter-spacing:12px; padding-left:12px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+  .plist{ display:flex; flex-direction:column; gap:9px; }
+  .pill{ display:flex; align-items:center; gap:10px; background:var(--card2); border-radius:14px; padding:12px 14px; font-weight:700; }
+  .pill .av{ width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900; flex-shrink:0; }
+  .pill .tag{ margin-left:auto; font-size:12px; color:var(--muted); font-weight:800; }
+  .pill.me{ border:1px solid var(--accent2); }
+  .pill.voted .tag{ color:var(--good); }
+
+  .cardface{ min-height:230px; border-radius:24px; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; cursor:pointer; user-select:none; border:1px solid var(--line);
+    background:var(--card2); transition:.2s; padding:24px; text-align:center; }
+  .cardface .hint-top{ font-size:14px; color:var(--muted); margin-bottom:14px; }
+  .cardface .word{ font-size:38px; font-weight:900; }
+  .cardface .tap{ font-size:16px; color:var(--muted); line-height:1.5; }
+  .cardface .tap b{ color:var(--text); }
+  .cardface.liar{ background:linear-gradient(150deg,#3a1226,#2a1140); border-color:var(--accent); }
+  .cardface.liar .word{ color:var(--accent); }
+  .cardface .sub{ font-size:14px; color:var(--muted); margin-top:12px; line-height:1.5; }
+
+  .order{ display:flex; flex-wrap:wrap; gap:7px; }
+  .obadge{ padding:8px 13px; border-radius:11px; background:var(--card2); font-weight:800; font-size:14px; }
+  .obadge .n{ color:var(--accent2); margin-right:5px; }
+
+  .timer{ text-align:center; }
+  .clock{ font-size:52px; font-weight:900; font-variant-numeric:tabular-nums; }
+  .clock.warn{ color:var(--accent); }
+
+  .vote-btn{ display:flex; align-items:center; gap:10px; width:100%; background:var(--card2);
+    border:1px solid transparent; border-radius:14px; padding:12px 14px; font-weight:800; font-size:15px;
+    color:var(--text); cursor:pointer; transition:.15s; }
+  .vote-btn.sel{ border-color:var(--accent); background:linear-gradient(150deg,#2a1140,var(--card2)); }
+  .vote-btn .cnt{ margin-left:auto; background:var(--bg); border-radius:10px; padding:3px 10px; font-size:13px; color:var(--accent); min-width:34px; text-align:center; }
+
+  .answer-word{ font-size:42px; font-weight:900; text-align:center; margin:6px 0 4px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .liar-list{ text-align:center; font-size:22px; font-weight:900; color:var(--accent); margin-top:6px; }
+  .muted-c{ text-align:center; color:var(--muted); font-size:13px; }
+
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(80px);
+    background:#000; color:#fff; padding:12px 20px; border-radius:14px; font-weight:700; font-size:14px;
+    opacity:0; transition:.25s; z-index:99; pointer-events:none; }
+  .toast.show{ transform:translateX(-50%) translateY(0); opacity:.95; }
+.playtop{ margin-bottom:8px; }
+  .playtop a{ display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--muted); font-weight:800; font-size:15px; transition:.15s; }
+  .playtop a:hover{ color:var(--text); }
+  .playtop .plogo{ width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:14px; }
+  .hostonly{ display:none; }
+  body.is-host .hostonly{ display:block; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="playtop"><a href="index.html"><span class="plogo">🎪</span> ‹ 쮸래기 놀이터</a></div>
+
+  <!-- ===== 홈 ===== -->
+  <div class="screen active" id="s-home">
+    <div class="logo">
+      <h1>라이어게임</h1>
+      <p>실시간 시참 · 각자 폰으로 접속</p>
+      <div class="status-dot mt">🟢 지금 접속 <b id="online-n" style="color:var(--good);margin:0 3px">–</b>명</div>
+    </div>
+    <div class="card">
+      <div class="label">👑 방장 (쮸래기)</div>
+      <button class="btn" onclick="createRoom()">방 만들기</button>
+    </div>
+    <div class="card">
+      <div class="label">🙋 시청자로 참가</div>
+      <input class="code" id="join-code" placeholder="방 코드" inputmode="numeric" maxlength="4">
+      <input class="mt" id="join-name" placeholder="닉네임" maxlength="10">
+      <button class="btn mt" onclick="joinRoom()">입장하기</button>
+    </div>
+    <p class="muted-c">방장이 방을 만들고 <b>4자리 코드</b>를 방송에 띄우면,<br>시청자들이 그 코드로 들어옵니다.</p>
+  </div>
+
+  <!-- ===== 방장 로비 ===== -->
+  <div class="screen" id="s-host">
+    <div class="logo"><h1 style="font-size:24px">방장 대기실</h1></div>
+    <div class="card codebig">
+      <div class="label" style="text-align:center">방 코드 (방송에 띄우세요)</div>
+      <div class="cc" id="host-code">----</div>
+      <button class="btn ghost small mt" onclick="copyCode()">📋 참가 링크 복사</button>
+    </div>
+    <div class="card">
+      <div class="label">📂 주제</div>
+      <div class="chips" id="host-cats"></div>
+    </div>
+    <div class="card">
+      <div class="row" style="gap:14px">
+        <div style="flex:1">
+          <div class="label">🕵️ 라이어 수</div>
+          <div class="stepper">
+            <button class="rbtn" onclick="chgLiars(-1)">−</button>
+            <div class="val" id="v-liars">1</div>
+            <button class="rbtn" onclick="chgLiars(1)">＋</button>
+          </div>
+        </div>
+      </div>
+      <div class="toggle mt" style="margin-top:18px">
+        <div class="label" style="margin:0">💡 라이어에게 주제 힌트</div>
+        <button class="switch on" id="sw-hint" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">👥 참가자 <span id="host-count" style="color:var(--text)">0</span>명</div>
+      <div class="plist" id="host-players"></div>
+    </div>
+    <button class="btn" id="start-btn" onclick="startGame()">게임 시작 🎬</button>
+    <p class="muted-c mt">최소 3명(방장 포함)부터 시작할 수 있어요.</p>
+    <button class="btn ghost small mt" onclick="leaveRoom()">방 닫고 나가기</button>
+  </div>
+
+  <!-- ===== 시청자 로비 ===== -->
+  <div class="screen" id="s-lobby">
+    <div class="logo"><h1 style="font-size:24px">대기실</h1><p>방장이 시작하면 자동으로 넘어가요</p></div>
+    <div class="card">
+      <div class="label">👥 참가자 <span id="lobby-count" style="color:var(--text)">0</span>명</div>
+      <div class="plist" id="lobby-players"></div>
+    </div>
+    <button class="btn ghost small" onclick="leaveRoom()">나가기</button>
+  </div>
+
+  <!-- ===== 내 역할 ===== -->
+  <div class="screen" id="s-role">
+    <div class="logo"><h1 style="font-size:22px">내 비밀</h1><p>나만 보세요 🤫</p></div>
+    <div class="cardface" id="role-card" onclick="flipRole()">
+      <div class="tap"><b>눌러서</b><br>내 단어 확인</div>
+    </div>
+    <div class="card mt">
+      <div class="label">🗣️ 설명 순서</div>
+      <div class="order" id="role-order"></div>
+    </div>
+    <button class="btn mt" onclick="go('s-play')">준비됐어요 → 게임판으로</button>
+  </div>
+
+  <!-- ===== 게임판(설명·투표) ===== -->
+  <div class="screen" id="s-play">
+    <div class="logo"><h1 style="font-size:22px">설명 & 지목</h1></div>
+    <div class="card timer">
+      <div class="label" style="text-align:center">⏱️ 토론 타이머</div>
+      <div class="clock" id="clock">–:––</div>
+      <div class="row mt hostonly">
+        <button class="btn ghost small" onclick="setTimer(90)">1:30</button>
+        <button class="btn small" onclick="setTimer(0)">멈춤</button>
+        <button class="btn ghost small" onclick="setTimer(180)">3:00</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">🕵️ 라이어로 의심되는 사람에게 투표</div>
+      <div class="plist" id="vote-list"></div>
+    </div>
+    <button class="btn hostonly" onclick="reveal()">정답 공개 🎭</button>
+    <p class="muted-c mt hostonly">방장만 공개 버튼이 보입니다.</p>
+    <p class="muted-c mt" id="wait-host" style="display:none">방장이 정답을 공개하면 자동으로 넘어가요…</p>
+    <button class="btn ghost small mt" onclick="showMyRoleAgain()">내 단어 다시 보기</button>
+  </div>
+
+  <!-- ===== 정답 공개 ===== -->
+  <div class="screen" id="s-answer">
+    <div class="logo"><h1 style="font-size:24px">🎭 정답 공개</h1></div>
+    <div class="card">
+      <div class="label" style="text-align:center">제시어</div>
+      <div class="answer-word" id="a-word">–</div>
+      <div class="muted-c" id="a-cat"></div>
+    </div>
+    <div class="card">
+      <div class="label" style="text-align:center">진짜 라이어는</div>
+      <div class="liar-list" id="a-liars">–</div>
+    </div>
+    <div class="card">
+      <div class="label">🗳️ 최다 지목</div>
+      <div class="plist" id="a-votes"></div>
+    </div>
+    <button class="btn hostonly" onclick="nextRound()">🔁 새 판 (같은 멤버)</button>
+    <button class="btn ghost small mt" onclick="leaveRoom()">방 나가기</button>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Firebase (밸런스게임과 동일한 실시간 DB 재사용) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* ===== Firebase 설정 (chubabetv — 밸런스게임과 동일) ===== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyD2odCX0V1dthMjilXcWOKOe4o8p1xuGYI",
+  authDomain: "chubabetv.firebaseapp.com",
+  databaseURL: "https://chubabetv-default-rtdb.firebaseio.com",
+  projectId: "chubabetv",
+  storageBucket: "chubabetv.firebasestorage.app",
+  messagingSenderId: "889265807362",
+  appId: "1:889265807362:web:c5cc2b27437b8e590bc71b"
+};
+
+/* ===== 제시어 데이터 ===== */
+const WORDS = {
+  "음식":["김치찌개","치킨","떡볶이","삼겹살","짜장면","마라탕","초밥","라면","곱창","붕어빵","순대","닭발","피자","햄버거","탕수육"],
+  "동물":["강아지","고양이","코끼리","펭귄","사자","기린","햄스터","돌고래","너구리","판다","고슴도치","앵무새","캥거루","악어","다람쥐"],
+  "장소":["학교","병원","노래방","찜질방","지하철","공항","편의점","헬스장","도서관","PC방","놀이공원","경찰서","목욕탕","캠핑장","웨딩홀"],
+  "직업":["의사","경찰","유튜버","요리사","선생님","가수","소방관","미용사","개그맨","변호사","택배기사","바리스타","프로게이머","아이돌","간호사"],
+  "사물":["냉장고","에어컨","칫솔","우산","리모컨","베개","안경","지갑","충전기","거울","드라이기","청소기","전자레인지","선풍기","가위"],
+  "방송":["별풍선","도네이션","구독","채팅","강퇴(밴)","방송사고","뒷광고","섬네일","편집점","실시간","합방","시청자","광고","BJ","클립"]
+};
+
+/* ===== 전역 상태 ===== */
+let db=null, roomRef=null, code=null, myId=null, isHost=false, room=null;
+let selectedCats=["음식"], liarCount=1, roleFlipped=false;
+
+const $=id=>document.getElementById(id);
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo(0,0); }
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function avatar(name){ return (name||'?').trim().charAt(0).toUpperCase()||'?'; }
+
+/* ===== Firebase 연결 ===== */
+try{ firebase.initializeApp(FIREBASE_CONFIG); db=firebase.database(); initOnline(); }
+catch(e){ toast("실시간 서버 연결 실패 (인터넷 확인)"); }
+
+function initOnline(){   // 홈 화면 전체 접속자 수 (밸런스게임과 같은 presence)
+  try{
+    const presRef=db.ref('presence'), conRef=db.ref('.info/connected');
+    conRef.on('value', s=>{ if(s.val()===true){ const me=presRef.push(); me.onDisconnect().remove(); me.set(true); } });
+    presRef.on('value', s=>{ $("online-n").textContent=s.numChildren(); });
+  }catch(e){}
+}
+
+/* ===== 카테고리 칩(방장) ===== */
+function buildCats(){
+  const box=$("host-cats"); box.innerHTML='';
+  Object.keys(WORDS).forEach(c=>{
+    const el=document.createElement('button');
+    el.className='chip'+(selectedCats.includes(c)?' on':'');
+    el.textContent=c;
+    el.onclick=()=>{
+      if(selectedCats.includes(c)){ if(selectedCats.length>1) selectedCats=selectedCats.filter(x=>x!==c); }
+      else selectedCats.push(c);
+      buildCats(); pushSettings();
+    };
+    box.appendChild(el);
+  });
+}
+function chgLiars(d){ liarCount=Math.max(1,Math.min(3,liarCount+d)); $("v-liars").textContent=liarCount; }
+
+/* ===== 방 만들기 (방장) ===== */
+function createRoom(){
+  if(!db) return toast("서버 연결 안 됨");
+  code=String(Math.floor(1000+Math.random()*9000));
+  roomRef=db.ref('liar_rooms/'+code);
+  isHost=true; document.body.classList.add('is-host');
+  myId=roomRef.child('players').push().key;
+
+  const hostName="쮸래기(방장)";
+  roomRef.set({
+    status:'waiting', hostId:myId, createdAt:firebase.database.ServerValue.TIMESTAMP,
+    players:{ [myId]:{ name:hostName, joined:firebase.database.ServerValue.TIMESTAMP } }
+  });
+  roomRef.child('players/'+myId).onDisconnect().remove();
+  $("host-code").textContent=code;
+  buildCats(); listenRoom(); go('s-host');
+}
+
+/* ===== 방 참가 (시청자) ===== */
+function joinRoom(){
+  if(!db) return toast("서버 연결 안 됨");
+  const c=$("join-code").value.trim(); const name=$("join-name").value.trim();
+  if(!/^\d{4}$/.test(c)) return toast("방 코드 4자리를 입력하세요");
+  if(!name) return toast("닉네임을 입력하세요");
+  db.ref('liar_rooms/'+c).once('value').then(s=>{
+    const r=s.val();
+    if(!r) return toast("그런 방이 없어요");
+    if(r.status!=='waiting') return toast("이미 시작된 방이에요");
+    code=c; roomRef=db.ref('liar_rooms/'+c); isHost=false;
+    myId=roomRef.child('players').push().key;
+    roomRef.child('players/'+myId).set({ name, joined:firebase.database.ServerValue.TIMESTAMP });
+    roomRef.child('players/'+myId).onDisconnect().remove();
+    listenRoom(); go('s-lobby');
+  });
+}
+
+/* ===== 방 상태 실시간 반영 ===== */
+let lastStatus=null;
+function listenRoom(){
+  roomRef.on('value', s=>{
+    room=s.val();
+    if(!room){ toast("방이 닫혔어요"); resetAll(); go('s-home'); return; }
+    const players=room.players||{};
+    // 방장 나가면 방 종료
+    if(!players[room.hostId]){ if(!isHost){ toast("방장이 나가서 방이 닫혔어요"); resetAll(); go('s-home'); return; } }
+
+    renderPlayers(players);
+    renderVoteList(players);
+
+    // 상태 전환
+    if(room.status!==lastStatus){
+      lastStatus=room.status;
+      if(room.status==='playing'){ roleFlipped=false; renderRole(); renderOrder(); go('s-role'); }
+      if(room.status==='reveal'){ renderAnswer(); go('s-answer'); }
+      if(room.status==='waiting'){ go(isHost?'s-host':'s-lobby'); }
+    }
+    if(room.status==='playing'){ renderOrder(); renderTimer(); }
+  });
+}
+
+function renderPlayers(players){
+  const ids=Object.keys(players);
+  const mk=(box,countEl)=>{
+    if(countEl) countEl.textContent=ids.length;
+    box.innerHTML='';
+    ids.forEach(id=>{
+      const p=players[id];
+      const el=document.createElement('div');
+      el.className='pill'+(id===myId?' me':'');
+      el.innerHTML='<div class="av">'+avatar(p.name)+'</div>'+p.name+
+        (id===room.hostId?'<span class="tag">👑 방장</span>':(id===myId?'<span class="tag">나</span>':''));
+      box.appendChild(el);
+    });
+  };
+  if(isHost) mk($("host-players"),$("host-count"));
+  mk($("lobby-players"),$("lobby-count"));
+  if(isHost) $("start-btn").disabled = ids.length<3;
+}
+
+/* ===== 게임 시작 (방장) ===== */
+function startGame(){
+  const players=room.players||{}; const ids=Object.keys(players);
+  if(ids.length<3) return toast("최소 3명이 필요해요");
+  const cat=rnd(selectedCats);
+  const word=rnd(WORDS[cat]);
+  const hint=$("sw-hint").classList.contains('on');
+  const nLiar=Math.min(liarCount, ids.length-2);
+  // 라이어 뽑기
+  const shuffled=[...ids].sort(()=>Math.random()-0.5);
+  const liars=new Set(shuffled.slice(0,nLiar));
+  // 설명 순서
+  const order=[...ids].sort(()=>Math.random()-0.5);
+  const upd={ status:'playing', word, category:cat, hint, order, timer:null };
+  ids.forEach(id=>{ upd['players/'+id+'/isLiar']=liars.has(id); upd['players/'+id+'/vote']=null; });
+  roomRef.update(upd);
+}
+
+/* ===== 내 역할 ===== */
+function renderRole(){
+  roleFlipped=false;
+  const card=$("role-card"); card.className='cardface';
+  card.innerHTML='<div class="tap"><b>눌러서</b><br>내 단어 확인</div>';
+}
+function flipRole(){
+  if(roleFlipped) return; roleFlipped=true;
+  const me=(room.players||{})[myId]; if(!me) return;
+  const card=$("role-card");
+  if(me.isLiar){
+    card.className='cardface liar';
+    card.innerHTML='<div class="hint-top">'+(room.hint?('주제: <b style="color:#fff">'+room.category+'</b>'):'&nbsp;')+'</div>'+
+      '<div class="word">당신은 라이어 🤫</div><div class="sub">제시어를 모릅니다.<br>들키지 않게 아는 척하세요!</div>';
+  }else{
+    card.className='cardface';
+    card.innerHTML='<div class="hint-top">주제: <b>'+room.category+'</b></div>'+
+      '<div class="word">'+room.word+'</div><div class="sub">이 단어를 직접 말하지 말고<br>돌려서 설명하세요</div>';
+  }
+}
+function showMyRoleAgain(){ renderRole(); go('s-role'); }
+function renderOrder(){
+  const players=room.players||{}; const order=room.order||[];
+  const html=order.map((id,i)=>'<div class="obadge"><span class="n">'+(i+1)+'</span>'+((players[id]||{}).name||'?')+'</div>').join('');
+  $("role-order").innerHTML=html; $("role-order").innerHTML=html;
+  const po=document.querySelectorAll('#role-order'); // play screen has its own? keep simple
+}
+
+/* ===== 타이머 (방장이 제어, 종료시각 공유) ===== */
+function setTimer(sec){
+  if(!isHost) return;
+  if(sec<=0){ roomRef.child('timer').set(null); return; }
+  roomRef.child('timer').set({ endsAt: Date.now()+sec*1000 });
+}
+function renderTimer(){
+  const t=room.timer; const el=$("clock");
+  if(!t||!t.endsAt){ el.textContent='–:––'; el.classList.remove('warn'); return; }
+  const left=Math.max(0,Math.round((t.endsAt-Date.now())/1000));
+  const m=Math.floor(left/60), s=left%60;
+  el.textContent=m+':'+String(s).padStart(2,'0');
+  el.classList.toggle('warn',left<=10);
+}
+setInterval(()=>{ if(room&&room.status==='playing') renderTimer(); },500);
+
+/* ===== 투표 ===== */
+function renderVoteList(players){
+  const box=$("vote-list"); if(!box) return;
+  if(!room||room.status!=='playing'){ box.innerHTML=''; return; }
+  const ids=Object.keys(players);
+  const myVote=(players[myId]||{}).vote;
+  // 득표 집계
+  const tally={}; ids.forEach(id=>{ const v=(players[id]||{}).vote; if(v) tally[v]=(tally[v]||0)+1; });
+  box.innerHTML='';
+  ids.forEach(id=>{
+    if(id===myId) return; // 자기 자신엔 투표 안 함
+    const p=players[id];
+    const b=document.createElement('button');
+    b.className='vote-btn'+(myVote===id?' sel':'');
+    b.innerHTML='<div class="av" style="width:26px;height:26px;font-size:12px">'+avatar(p.name)+'</div>'+p.name+
+      '<span class="cnt">'+(tally[id]||0)+'</span>';
+    b.onclick=()=>castVote(id);
+    box.appendChild(b);
+  });
+  $("wait-host").style.display=isHost?'none':'block';
+}
+function castVote(targetId){
+  const myVote=(room.players[myId]||{}).vote;
+  roomRef.child('players/'+myId+'/vote').set(myVote===targetId?null:targetId);
+}
+
+/* ===== 정답 공개 ===== */
+function reveal(){ if(isHost) roomRef.child('status').set('reveal'); }
+function renderAnswer(){
+  const players=room.players||{}; const ids=Object.keys(players);
+  $("a-word").textContent=room.word||'–';
+  $("a-cat").textContent='주제: '+(room.category||'');
+  const liars=ids.filter(id=>players[id].isLiar).map(id=>players[id].name);
+  $("a-liars").textContent=liars.join(', ')||'–';
+  // 투표 집계
+  const tally={}; ids.forEach(id=>{ const v=players[id].vote; if(v) tally[v]=(tally[v]||0)+1; });
+  const max=Math.max(0,...Object.values(tally));
+  const box=$("a-votes"); box.innerHTML='';
+  ids.map(id=>({id,n:tally[id]||0})).sort((a,b)=>b.n-a.n).forEach(o=>{
+    const p=players[o.id]; const top=(o.n>0&&o.n===max);
+    const el=document.createElement('div');
+    el.className='pill'; if(p.isLiar) el.style.borderColor='var(--accent)';
+    el.innerHTML='<div class="av">'+avatar(p.name)+'</div>'+p.name+
+      (p.isLiar?' <span style="color:var(--accent);font-size:12px;font-weight:900">라이어</span>':'')+
+      '<span class="tag" style="color:'+(top?'var(--accent)':'var(--muted)')+'">'+o.n+'표'+(top?' 👈':'')+'</span>';
+    box.appendChild(el);
+  });
+}
+function nextRound(){ if(isHost) startGame(); }
+
+/* ===== 나가기 / 정리 ===== */
+function leaveRoom(){
+  try{
+    if(roomRef&&myId){
+      if(isHost) roomRef.remove();            // 방장 나가면 방 삭제
+      else roomRef.child('players/'+myId).remove();
+      roomRef.off();
+    }
+  }catch(e){}
+  resetAll(); go('s-home');
+}
+function resetAll(){ roomRef=null; code=null; myId=null; isHost=false; room=null; lastStatus=null;
+  document.body.classList.remove('is-host'); }
+
+function copyCode(){
+  const url=location.origin+location.pathname+'?room='+code;
+  navigator.clipboard?.writeText(url).then(()=>toast("참가 링크 복사됨!"),()=>toast("코드: "+code));
+}
+/* URL ?room=1234 로 들어오면 코드 자동 입력 */
+(function(){ const p=new URLSearchParams(location.search).get('room'); if(p&&/^\d{4}$/.test(p)) $("join-code").value=p; })();
+</script>
+</body>
+</html>
