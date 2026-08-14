@@ -123,6 +123,18 @@
   .clueitem .ct{ font-size:15px; line-height:1.35; word-break:break-word; }
   .feed-empty{ text-align:center; color:var(--muted); font-size:13px; padding:14px 0; }
 
+  /* game top sticky bar + compact */
+  .playbar{ position:sticky; top:0; z-index:30; background:rgba(18,16,28,.96); backdrop-filter:blur(6px);
+    padding:10px 0 9px; margin-bottom:8px; box-shadow:0 8px 14px -10px rgba(0,0,0,.7); }
+  .order.mini{ gap:5px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px; }
+  .order.mini .obadge{ padding:5px 9px; font-size:12px; white-space:nowrap; }
+  #s-play .card{ padding:14px; margin-bottom:10px; }
+  #s-play .cluefeed{ max-height:44vh; }
+  .cb.typing{ display:flex; align-items:center; min-height:22px; }
+  .dots{ display:flex; gap:4px; align-items:center; height:9px; }
+  .dots span{ width:7px; height:7px; border-radius:50%; background:var(--muted); animation:blink 1.2s infinite; }
+  .dots span:nth-child(2){ animation-delay:.2s; } .dots span:nth-child(3){ animation-delay:.4s; }
+  @keyframes blink{ 0%,60%,100%{opacity:.25;} 30%{opacity:1;} }
   .vote-btn{ display:flex; align-items:center; gap:10px; width:100%; background:var(--card2);
     border:1px solid transparent; border-radius:14px; padding:12px 14px; font-weight:800; font-size:15px;
     color:var(--text); cursor:pointer; transition:.15s; }
@@ -171,8 +183,9 @@
   <div class="screen active" id="s-home">
     <div class="logo"><h1>라이어게임</h1><p>실시간 시참 · 각자 폰으로 접속</p></div>
     <div class="card">
-      <div class="label">👑 방장 (쮸래기)</div>
-      <button class="btn" onclick="createRoom()">방 만들기</button>
+      <div class="label">👑 방장으로 방 만들기</div>
+      <input id="host-name" placeholder="닉네임 (기본: 쮸래기)" maxlength="10">
+      <button class="btn mt" onclick="createRoom()">방 만들기</button>
     </div>
     <div class="card">
       <div class="label">🙋 시청자로 참가</div>
@@ -276,13 +289,11 @@
 
   <!-- ===== 게임판 ===== -->
   <div class="screen" id="s-play">
-    <div class="card"><div class="turnb" id="turn-banner"></div></div>
-    <div class="card">
-      <div class="label">🗣️ 설명 순서</div>
-      <div class="order" id="play-order"></div>
+    <div class="playbar">
+      <div class="turnb" id="turn-banner"></div>
+      <div class="order mini" id="play-order" style="margin-top:8px"></div>
     </div>
     <div class="card">
-      <div class="label">💬 설명 기록</div>
       <div class="cluefeed" id="clue-feed"></div>
     </div>
     <div class="card" id="input-card" style="display:none">
@@ -294,7 +305,6 @@
       <div class="label">🕵️ 라이어로 의심되는 사람에게 투표</div>
       <div class="plist" id="vote-list"></div>
     </div>
-    <button class="btn ghost small hostonly" id="skip-btn" onclick="hostSkip()" style="display:none">⏭️ 이 차례 넘기기</button>
     <button class="btn hostonly" id="open-vote-btn" onclick="openVote()" style="display:none">🗳️ 투표 시작</button>
     <button class="btn hostonly" id="reveal-btn" onclick="reveal()" style="display:none">정답 공개 🎭</button>
     <button class="btn ghost small mt" onclick="showMyRoleAgain()">내 단어 다시 보기</button>
@@ -415,14 +425,20 @@ function buildTurnTime(){
 }
 
 /* ===== 방 만들기 / 참가 ===== */
+function uniqueName(base, players){
+  var names=Object.values(players||{}).map(function(p){return p.name;});
+  if(names.indexOf(base)<0) return base;
+  var i=2; while(names.indexOf(base+i)>=0) i++; return base+i;
+}
 function createRoom(){
   if(!db) return toast("서버 연결 안 됨");
   code=String(Math.floor(1000+Math.random()*9000));
   roomRef=db.ref('liar_rooms/'+code);
   isHost=true; document.body.classList.add('is-host');
+  var hn=(($("host-name")&&$("host-name").value)||'').trim()||"쮸래기";
   myId=roomRef.child('players').push().key;
   roomRef.set({ status:'waiting', hostId:myId, createdAt:firebase.database.ServerValue.TIMESTAMP,
-    players:{ [myId]:{ name:"쮸래기(방장)", joined:firebase.database.ServerValue.TIMESTAMP } } });
+    players:{ [myId]:{ name:hn, joined:firebase.database.ServerValue.TIMESTAMP } } });
   roomRef.child('players/'+myId).onDisconnect().remove();
   $("host-code").textContent=code;
   buildTurnTime(); pickMode('classic'); listenRoom(); go('s-host');
@@ -437,8 +453,9 @@ function joinRoom(){
     if(!r) return toast("그런 방이 없어요");
     if(r.status!=='waiting') return toast("이미 시작된 방이에요");
     code=c; roomRef=db.ref('liar_rooms/'+c); isHost=false;
+    const uname=uniqueName(name, r.players);
     myId=roomRef.child('players').push().key;
-    roomRef.child('players/'+myId).set({ name, joined:firebase.database.ServerValue.TIMESTAMP });
+    roomRef.child('players/'+myId).set({ name:uname, joined:firebase.database.ServerValue.TIMESTAMP });
     roomRef.child('players/'+myId).onDisconnect().remove();
     listenRoom(); go('s-lobby');
   });
@@ -449,7 +466,7 @@ function addBot(){
   const bots=Object.values(players).filter(p=>p.bot).length;
   const names=["연습이","테스트리","봇둘리","가짜맨","더미"];
   const nm=(names[bots]||("테스트"+(bots+1)))+" 🤖";
-  roomRef.child('players').push({ name:nm, bot:true });
+  roomRef.child('players').push({ name:uniqueName(nm, players), bot:true });
   toast(nm+" 참가!");
 }
 
@@ -589,10 +606,13 @@ function renderPlay(){
 
   renderOrder('play-order');
   renderClues();
+  if(!voteOpen){ var feed=$("clue-feed"); if(feed){ var tnm=(players[curId]||{}).name||'?';
+    var tb=document.createElement('div'); tb.className='clueitem'+(curId===myId?' mine':'');
+    tb.innerHTML='<div class="ca">'+avatar(tnm)+'</div><div class="cb typing"><div class="dots"><span></span><span></span><span></span></div></div>';
+    feed.appendChild(tb); feed.scrollTop=feed.scrollHeight; } }
   $("input-card").style.display = isMyTurn ? 'block' : 'none';
   $("vote-card").style.display  = voteOpen ? 'block' : 'none';
   if(voteOpen) renderVoteList(players);
-  $("skip-btn").style.display = (isHost && !voteOpen) ? 'block' : 'none';
   $("open-vote-btn").style.display = (isHost && !voteOpen) ? 'block' : 'none';
   $("reveal-btn").style.display = (isHost && voteOpen) ? 'block' : 'none';
   maybeBotPlay(curId, voteOpen);
@@ -648,11 +668,6 @@ function maybeBotPlay(curId, voteOpen){
     const order=room.order||[]; if(order[room.turnIdx||0]!==curId) return;
     postClue(curId, rnd(BOT_LINES));
   }, 1500);
-}
-function hostSkip(){
-  if(!isHost || !room || room.voteOpen) return;
-  const order=room.order||[]; const curId=order[room.turnIdx||0];
-  if(curId) postClue(curId, '⏭️ (넘김)');
 }
 
 /* ===== 투표 ===== */
@@ -791,7 +806,7 @@ setInterval(function(){
   if(el){ const m=Math.floor(left/60), s=left%60; el.textContent=m+':'+String(s).padStart(2,'0'); el.classList.toggle('danger',left<=10); }
   if(left<=0){
     const order=room.order||[], curId=order[room.turnIdx||0], stamp=(room.round||1)+'-'+(room.turnIdx||0);
-    if(curId===myId && toStamp!==stamp){ toStamp=stamp; postClue(myId,'⏰ (시간초과)'); }
+    if(isHost && toStamp!==stamp){ toStamp=stamp; postClue(curId,'⏰ (시간초과)'); }
   }
 }, 500);
 
