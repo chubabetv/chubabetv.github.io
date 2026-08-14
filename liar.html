@@ -13,7 +13,7 @@
   }
   html,body{height:100%;}
   body{ font-family:'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
-    background:radial-gradient(120% 80% at 50% -10%,#2a2140 0%,var(--bg) 55%);
+    background:var(--bg); background-image:linear-gradient(180deg,#241d38 0%,rgba(18,16,28,0) 62vh); background-repeat:no-repeat;
     color:var(--text); min-height:100dvh; display:flex; align-items:flex-start; justify-content:center;
     padding:16px; overflow-x:hidden; }
   .app{ width:100%; max-width:460px; margin:auto; }
@@ -126,7 +126,7 @@
   /* game top sticky bar + compact */
   .playbar{ position:sticky; top:0; z-index:30; background:rgba(18,16,28,.96); backdrop-filter:blur(6px);
     padding:10px 0 9px; margin-bottom:8px; box-shadow:0 8px 14px -10px rgba(0,0,0,.7); }
-  .order.mini{ gap:5px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px; }
+  .order.mini{ gap:5px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px; justify-content:center; }
   .order.mini .obadge{ padding:5px 9px; font-size:12px; white-space:nowrap; }
   #s-play .card{ padding:14px; margin-bottom:10px; }
   #s-play .cluefeed{ max-height:44vh; }
@@ -135,11 +135,11 @@
   .dots span{ width:7px; height:7px; border-radius:50%; background:var(--muted); animation:blink 1.2s infinite; }
   .dots span:nth-child(2){ animation-delay:.2s; } .dots span:nth-child(3){ animation-delay:.4s; }
   @keyframes blink{ 0%,60%,100%{opacity:.25;} 30%{opacity:1;} }
-  .vote-btn{ display:flex; align-items:center; gap:10px; width:100%; background:var(--card2);
+  .vote-btn{ display:flex; align-items:center; justify-content:center; position:relative; gap:10px; width:100%; background:var(--card2);
     border:1px solid transparent; border-radius:14px; padding:12px 14px; font-weight:800; font-size:15px;
     color:var(--text); cursor:pointer; transition:.15s; }
   .vote-btn.sel{ border-color:var(--accent); background:linear-gradient(150deg,#2a1140,var(--card2)); }
-  .vote-btn .cnt{ margin-left:auto; background:var(--bg); border-radius:10px; padding:3px 10px; font-size:13px; color:var(--accent); min-width:34px; text-align:center; }
+  .vote-btn .cnt{ position:absolute; right:12px; top:50%; transform:translateY(-50%); background:var(--bg); border-radius:10px; padding:3px 10px; font-size:13px; color:var(--accent); min-width:34px; text-align:center; }
 
   .answer-word{ font-size:42px; font-weight:900; text-align:center; margin:6px 0 4px;
     background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
@@ -305,7 +305,6 @@
       <div class="label">🕵️ 라이어로 의심되는 사람에게 투표</div>
       <div class="plist" id="vote-list"></div>
     </div>
-    <button class="btn hostonly" id="open-vote-btn" onclick="openVote()" style="display:none">🗳️ 투표 시작</button>
     <button class="btn hostonly" id="reveal-btn" onclick="reveal()" style="display:none">정답 공개 🎭</button>
     <button class="btn ghost small mt" onclick="showMyRoleAgain()">내 단어 다시 보기</button>
   </div>
@@ -363,12 +362,22 @@
 <script>
 /* ===== 제시어 데이터 ===== */
 const WORDS = {
-  "음식":["김치찌개","치킨","떡볶이","삼겹살","짜장면","마라탕","초밥","라면","곱창","붕어빵","순대","닭발","피자","햄버거","탕수육"],
-  "동물":["강아지","고양이","코끼리","펭귄","사자","기린","햄스터","돌고래","너구리","판다","고슴도치","앵무새","캥거루","악어","다람쥐"],
-  "장소":["학교","병원","노래방","찜질방","지하철","공항","편의점","헬스장","도서관","PC방","놀이공원","경찰서","목욕탕","캠핑장","웨딩홀"],
-  "직업":["의사","경찰","유튜버","요리사","선생님","가수","소방관","미용사","개그맨","변호사","택배기사","바리스타","프로게이머","아이돌","간호사"],
-  "사물":["냉장고","에어컨","칫솔","우산","리모컨","베개","안경","지갑","충전기","거울","드라이기","청소기","전자레인지","선풍기","가위"],
-  "방송":["별풍선","도네이션","구독","채팅","강퇴(밴)","방송사고","뒷광고","섬네일","편집점","실시간","합방","시청자","광고","BJ","클립"]
+  "음식":["김치찌개","치킨","떡볶이","삼겹살","짜장면","마라탕","초밥","라면","곱창","붕어빵","순대","닭발","피자","햄버거","탕수육","비빔밥","냉면","김밥","만두","돈까스","카레","파스타","족발","보쌈","갈비","국밥","쌀국수","타코","샐러드","핫도그"],
+  "과일":["사과","바나나","딸기","수박","포도","복숭아","귤","키위","망고","파인애플","체리","블루베리","레몬","자두","감","배","멜론","석류","무화과","두리안"],
+  "동물":["강아지","고양이","코끼리","펭귄","사자","기린","햄스터","돌고래","너구리","판다","고슴도치","앵무새","캥거루","악어","다람쥐","호랑이","곰","여우","늑대","토끼","사슴","원숭이","코알라","나무늘보","카멜레온","문어","상어","고래","낙타","얼룩말"],
+  "장소":["학교","병원","노래방","찜질방","지하철역","공항","편의점","헬스장","도서관","PC방","놀이공원","경찰서","목욕탕","캠핑장","웨딩홀","수영장","미용실","주유소","카페","영화관","박물관","동물원","시장","은행","우체국"],
+  "직업":["의사","경찰","유튜버","요리사","선생님","가수","소방관","미용사","개그맨","변호사","택배기사","바리스타","프로게이머","아이돌","간호사","판사","농부","어부","파일럿","승무원","댄서","화가","작가","기자","수의사"],
+  "사물":["냉장고","에어컨","칫솔","우산","리모컨","베개","안경","지갑","충전기","거울","드라이기","청소기","전자레인지","선풍기","가위","망치","자물쇠","돋보기","손톱깎이","체온계","계산기","다리미","빗자루","양초","나침반"],
+  "스포츠":["축구","농구","야구","배구","테니스","수영","골프","볼링","탁구","배드민턴","권투","양궁","펜싱","스키","스케이트","요가","클라이밍","컬링","마라톤","서핑"],
+  "교통수단":["자동차","버스","비행기","자전거","오토바이","기차","택시","헬리콥터","요트","잠수함","트럭","킥보드","케이블카","열기구","롤러코스터","구급차","소방차","경운기"],
+  "자연/날씨":["무지개","번개","태풍","눈사람","화산","폭포","사막","빙산","오로라","쓰나미","지진","안개","이슬","단풍","고드름","모래","별똥별","회오리","종유석","메아리"],
+  "악기":["피아노","기타","드럼","바이올린","플루트","하모니카","트럼펫","첼로","색소폰","탬버린","실로폰","아코디언","장구","가야금","우쿨렐레"],
+  "캐릭터":["산타클로스","인어공주","피노키오","신데렐라","백설공주","도깨비","유령","좀비","마법사","공주","왕자","요정","드래곤","유니콘","슈퍼맨","로봇","마녀","해적"],
+  "감정":["행복","슬픔","분노","사랑","질투","공포","설렘","지루함","피곤","긴장","부끄러움","자신감","외로움","감동","후회"],
+  "신체":["머리카락","눈썹","콧구멍","입술","혓바닥","귓불","어깨","팔꿈치","무릎","발톱","배꼽","손바닥","이마","턱","볼","정강이","발뒤꿈치","새끼손가락"],
+  "계절/명절":["봄","여름","가을","겨울","설날","추석","크리스마스","핼러윈","생일","어린이날","어버이날","밸런타인데이","광복절","단오","정월대보름"],
+  "학교/문구":["연필","지우개","공책","가위","풀","크레파스","자","샤프","형광펜","필통","교과서","칠판","분필","실내화","급식","시간표","책가방","도시락"],
+  "방송":["별풍선","도네이션","구독","채팅","강퇴","방송사고","뒷광고","섬네일","편집점","실시간","합방","시청자","광고","BJ","클립","구독자","알림설정","후원"]
 };
 const BOT_LINES=["아~ 그거 있잖아 🤔","다들 아는 그거ㅋㅋ","말하긴 좀 애매하네","완전 유명하지","나도 좋아해요 ㅎㅎ","음… 상황 봐서~","어~~ 그거~ 맞지?","은근 자주 보임"];
 
@@ -613,7 +622,6 @@ function renderPlay(){
   $("input-card").style.display = isMyTurn ? 'block' : 'none';
   $("vote-card").style.display  = voteOpen ? 'block' : 'none';
   if(voteOpen) renderVoteList(players);
-  $("open-vote-btn").style.display = (isHost && !voteOpen) ? 'block' : 'none';
   $("reveal-btn").style.display = (isHost && voteOpen) ? 'block' : 'none';
   maybeBotPlay(curId, voteOpen);
 }
